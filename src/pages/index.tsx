@@ -1,10 +1,39 @@
+import axios from "axios";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import io from "socket.io-client";
 import { api } from "~/utils/api";
+let socket;
 
 export default function Home() {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  // const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  const [value, setValue] = useState("");
+
+  useEffect(() => {
+    const socketInit = async () => {
+      await axios.get("/api/socket");
+      socket = io({
+        path: "/api/socket_io",
+      });
+
+      socket.on("connect", () => {
+        console.log("connectted");
+      });
+
+      socket.on("message-update", (data) => {
+        setValue(data);
+      });
+    };
+
+    socketInit().catch(console.error);
+  }, []);
+
+  const onChangeHandler = (e) => {
+    setValue(e.target.value);
+    socket.emit("message-send", e.target.value);
+  };
 
   return (
     <>
@@ -44,9 +73,12 @@ export default function Home() {
           </div>
           <div className="flex flex-col items-center gap-2">
             <p className="text-2xl text-white">
-              {hello.data ? hello.data.greeting : "Loading tRPC query..."}
+              {/* {hello.data ? hello.data.greeting : "Loading tRPC query..."} */}
             </p>
-            <AuthShowcase />
+            {/* <AuthShowcase /> */}
+          </div>
+          <div>
+            <input type="text" value={value} onChange={onChangeHandler} />
           </div>
         </div>
       </main>
