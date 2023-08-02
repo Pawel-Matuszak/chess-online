@@ -2,37 +2,47 @@ import axios from "axios";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import io from "socket.io-client";
+import { ChangeEvent, useEffect, useState } from "react";
+import { useSocketState } from "~/hooks/useSocketState";
 import { api } from "~/utils/api";
-let socket;
+import { socket } from "~/utils/socket";
 
 export default function Home() {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
   const [value, setValue] = useState("");
+  const [code, setCode] = useState("");
+  const [messages, setMessages] = useState<string[]>([]);
+  const { isConnected } = useSocketState();
 
   useEffect(() => {
     const socketInit = async () => {
       await axios.get("/api/socket");
-      socket = io({
-        path: "/api/socket_io",
-      });
-
-      socket.on("connect", () => {
-        console.log("connectted");
-      });
-
-      socket.on("message-update", (data) => {
-        setValue(data);
-      });
+      socket.connect();
     };
-
     socketInit().catch(console.error);
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
-  const onChangeHandler = (e) => {
-    setValue(e.target.value);
-    socket.emit("message-send", e.target.value);
+  useEffect(() => {
+    socket.on("game-update", (data) => {
+      console.log("game-update", data);
+      setMessages([...messages, data]);
+    });
+  }, [messages]);
+
+  const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+    setValue(event.target.value);
+  };
+
+  const onSendMessage = (value: string) => {
+    socket.emit("game-update", code, value);
+  };
+
+  const handleCreateGame = () => {
+    socket.emit("create-game", code);
   };
 
   return (
@@ -45,9 +55,12 @@ export default function Home() {
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
           <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
+            {isConnected ? "Connected" : "Not Connected"}
           </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
+          <div
+            className="grid grid-cols-1 gap-4 text-white sm:grid-cols-2 md:gap-8
+"
+          >
             <Link
               className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
               href="https://create.t3.gg/en/usage/first-steps"
@@ -77,8 +90,36 @@ export default function Home() {
             </p>
             {/* <AuthShowcase /> */}
           </div>
+          {/* <div className="">
+            <p>Join game</p>
+            <input type="text" placeholder="Code" />
+            <button>Join</button>
+          </div> */}
+          <div className="">
+            <p>Create game</p>
+            <input
+              type="text"
+              placeholder="Code"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+            <button onClick={() => handleCreateGame()}>Create</button>
+          </div>
+
           <div>
-            <input type="text" value={value} onChange={onChangeHandler} />
+            <input
+              type="text"
+              value={value}
+              onChange={(e) => onChangeHandler(e)}
+            />
+            <button className="" onClick={() => onSendMessage(value)}>
+              SEND
+            </button>
+          </div>
+          <div className="flex flex-col ">
+            {messages.map((message, index) => (
+              <div key={index}>{message}</div>
+            ))}
           </div>
         </div>
       </main>
