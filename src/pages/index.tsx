@@ -7,11 +7,13 @@ import { socket } from "~/utils/socket";
 export default function Home() {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
   const [value, setValue] = useState("");
-  const [code, setCode] = useState("");
   const [moves, setMoves] = useState<string[]>([]);
+  const [code, setCode] = useState("");
   const { isConnected } = useSocketState();
   const [errorMsg, setErrorMsg] = useState("");
   const [gameJoined, setGameJoined] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [hideJoinGame, setHideJoinGame] = useState(false);
 
   useEffect(() => {
     const socketInit = async () => {
@@ -24,6 +26,10 @@ export default function Home() {
           setErrorMsg(status ? "" : message);
         }
       );
+
+      socket.on("start-game", ({ status }: { status: boolean }) => {
+        setGameStarted(status);
+      });
 
       socket.on(
         "created-game",
@@ -57,6 +63,7 @@ export default function Home() {
 
   const onCreateGame = () => {
     socket.emit("create-game");
+    setHideJoinGame(true);
   };
 
   const onJoinGame = () => {
@@ -82,28 +89,32 @@ export default function Home() {
             >
               Create game
             </button>
-            {code && <div className="">Your game code is: {code}</div>}
+            {hideJoinGame && code && (
+              <div className="">Your game code is: {code}</div>
+            )}
           </div>
-          <div className="">
-            <p>Join game</p>
-            <input
-              className="text-black"
-              type="text"
-              placeholder="Code"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-            />
-            <button onClick={() => onJoinGame()}>Join</button>
-          </div>
+          {!hideJoinGame && (
+            <div className="">
+              <p>Join game</p>
+              <input
+                className="text-black"
+                type="text"
+                placeholder="Code"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+              />
+              <button onClick={() => onJoinGame()}>Join</button>
+            </div>
+          )}
           <p className="text-red-600">{errorMsg}</p>
-          {gameJoined && (
+          {gameStarted && (
             <div>
               <input
                 className="text-black"
                 type="text"
                 value={value}
                 onChange={(e) => onChangeHandler(e)}
-                disabled={!gameJoined}
+                disabled={!gameStarted}
               />
               <button className="" onClick={() => onSendMessage(value)}>
                 SEND

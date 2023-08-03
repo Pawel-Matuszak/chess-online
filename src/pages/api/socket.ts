@@ -26,7 +26,7 @@ export default function handler(
 
   const checkIfRoomExists = (id: string) => {
     const room = getRoom(id);
-    return !room || room.size == 0 ? true : false;
+    return room ? true : false;
   };
 
   const checkIfRoomIsFull = (id: string) => {
@@ -35,8 +35,9 @@ export default function handler(
   };
 
   io.on("connection", (socket) => {
-    socket.on("join-game", async (id: string) => {
-      if (checkIfRoomExists(id)) {
+    const joinGameHandler = async (id: string) => {
+      //TODO: check if is already joined
+      if (!checkIfRoomExists(id)) {
         socket.emit("joined-game", {
           status: false,
           message: "Room not found",
@@ -44,15 +45,28 @@ export default function handler(
         return;
       }
       if (checkIfRoomIsFull(id)) {
-        socket.emit("joined-game", { status: false, message: "Room full" });
+        socket.emit("joined-game", {
+          status: false,
+          message: "Room full",
+        });
         return;
       }
 
       await socket.join(id);
-      socket.emit("joined-game", { status: true });
-    });
 
-    socket.on("create-game", async () => {
+      socket.emit("joined-game", {
+        status: true,
+        message: "Joined game successfully",
+      });
+
+      if (getRoom(id)?.size === 2)
+        io.in(id).emit("start-game", {
+          status: true,
+          message: "Game started",
+        });
+    };
+
+    const createGameHandler = async () => {
       let gameId;
       while (gameId == null || gameId.length !== 5) {
         gameId = generateGameId();
@@ -60,11 +74,15 @@ export default function handler(
 
       await socket.join(gameId);
       socket.emit("created-game", { status: true, id: gameId });
-    });
+    };
 
-    socket.on("game-update", (id: string, gameString: string) => {
+    const gameUpdateHandler = (id: string, gameString: string) => {
       io.to(id).emit("game-update", gameString);
-    });
+    };
+
+    socket.on("join-game", joinGameHandler);
+    socket.on("create-game", createGameHandler);
+    socket.on("game-update", gameUpdateHandler);
   });
 
   if (res.socket) res.socket.server.io = io;
