@@ -1,5 +1,6 @@
 import { NextApiRequest } from "next";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { NextApiResponseWithSocket } from "~/types";
 
 export default function handler(
@@ -31,10 +32,11 @@ export default function handler(
 
   const checkIfRoomIsFull = (id: string) => {
     const room = getRoom(id);
-    console.log(room);
     return room && room.size >= 2 ? true : false;
   };
-  const leaveAllRooms = async (socket: any) => {
+  const leaveAllRooms = async (
+    socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
+  ) => {
     for (const room of socket.rooms) {
       await socket.leave(room);
     }
@@ -42,7 +44,8 @@ export default function handler(
 
   io.on("connection", (socket) => {
     const joinGameHandler = async (id: string) => {
-      //TODO: check if is already joined
+      // console.log(getRoom(id));
+
       if (socket.rooms.has(id)) {
         socket.emit("joined-game", {
           status: false,
@@ -68,7 +71,6 @@ export default function handler(
 
       await leaveAllRooms(socket);
       await socket.join(id);
-
       socket.emit("joined-game", {
         status: true,
         id,
@@ -96,15 +98,9 @@ export default function handler(
       io.to(id).emit("game-update", gameString);
     };
 
-    const disconnectHandler = async () => {
-      await leaveAllRooms(socket);
-      console.log(socket.rooms);
-    };
-
     socket.on("join-game", joinGameHandler);
     socket.on("create-game", createGameHandler);
     socket.on("game-update", gameUpdateHandler);
-    socket.on("disconnectt", disconnectHandler);
   });
 
   if (res.socket) res.socket.server.io = io;

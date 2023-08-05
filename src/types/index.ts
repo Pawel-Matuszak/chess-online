@@ -15,7 +15,10 @@ export interface NextApiResponseWithSocket extends NextApiResponse {
   socket: SocketWithIO;
 }
 
+export type GameState = "initial" | "joined" | "started" | "ended";
+
 export interface IGlobalSlice {
-  gameState: "initial" | "joined" | "started" | "ended";
+  gameState: GameState;
   roomId: string;
+  message: string;
 }
