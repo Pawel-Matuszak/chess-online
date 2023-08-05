@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { BiCopy } from "react-icons/bi";
 import { useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
+import Button from "../Common/Button";
 
 const GameMenu = () => {
   const [code, setCode] = useState("");
   const [showJoinGame, setShowJoinGame] = useState(true);
   const [isCopied, setIsCopied] = useState(false);
-  const { roomId, gameState } = useAppSelector((state) => state.global);
+  const { roomId, message } = useAppSelector((state) => state.global);
 
   const onCreateGame = () => {
     socket.emit("create-game");
@@ -37,31 +38,24 @@ const GameMenu = () => {
           value={code}
           onChange={(e) => setCode(e.target.value)}
         />
-        <button
-          onClick={() => onJoinGame()}
-          className="rounded-sm bg-yellow-300 p-2 font-semibold text-slate-900"
-        >
-          Join
-        </button>
+        <Button onClick={() => onJoinGame()}>Join</Button>
       </div>
       <div className="flex  flex-col items-center justify-start">
-        <button
-          onClick={() => onCreateGame()}
-          className="rounded-sm bg-yellow-300 p-2 font-semibold text-slate-900 "
-        >
-          Create game
-        </button>
+        <Button onClick={() => onCreateGame()}>Create game</Button>
         {!showJoinGame && roomId && (
           <div className="m-2  text-center" onClick={copyToClipboard}>
-            <div className="flex cursor-pointer items-center  text-lg">
+            <div className="flex cursor-pointer items-center text-lg">
               <p className="mx-1">
                 Your game code is: <span className="font-bold">{roomId}</span>
               </p>
               <BiCopy />
             </div>
-            {isCopied && <p className="">Copied to clipboard!</p>}
+            {isCopied && <p>Copied to clipboard!</p>}
           </div>
         )}
+      </div>
+      <div className="m-4">
+        <p className="text-center text-red-600">{message}</p>
       </div>
     </div>
   );

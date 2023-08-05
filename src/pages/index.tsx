@@ -1,20 +1,22 @@
 import axios from "axios";
 import Head from "next/head";
 import { ChangeEvent, useEffect, useState } from "react";
-import GameMenu from "~/components/GameMenu";
+import GameMenu from "~/components/GameMenu/GameMenu";
 import { useSocketState } from "~/hooks/useSocketState";
-import { setGameState, setRoomId } from "~/state/globalSlice";
+import { setGameState, setMessage, setRoomId } from "~/state/globalSlice";
 import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
 
 export default function Home() {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
   const [value, setValue] = useState("");
+
   const [moves, setMoves] = useState<string[]>([]);
   const { isConnected } = useSocketState();
-  const [errorMsg, setErrorMsg] = useState("");
   const dispatch = useAppDispatch();
-  const { roomId, gameState } = useAppSelector((state) => state.global);
+  const { roomId, gameState, message } = useAppSelector(
+    (state) => state.global
+  );
 
   useEffect(() => {
     const socketInit = async () => {
@@ -33,7 +35,7 @@ export default function Home() {
         }) => {
           dispatch(setGameState("joined"));
           status && dispatch(setRoomId(id));
-          setErrorMsg(!status ? message : "");
+          dispatch(setMessage(!status ? message : ""));
         }
       );
 
@@ -44,11 +46,14 @@ export default function Home() {
       socket.on(
         "created-game",
         ({ status, id }: { status: boolean; id: string }) => {
-          status && dispatch(setRoomId(id));
-          status && dispatch(setGameState("joined"));
+          if (status) {
+            dispatch(setRoomId(id));
+            dispatch(setGameState("joined"));
+            dispatch(setMessage(""));
+          }
         }
       );
-      setErrorMsg("");
+      dispatch(setMessage(""));
     };
     socketInit().catch(console.error);
 
@@ -84,7 +89,7 @@ export default function Home() {
         {isConnected !== "loading" && (
           <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
             <GameMenu />
-            <p className="text-red-600">{errorMsg}</p>
+            {/* 
             {isGameStarted && (
               <div>
                 <input
@@ -103,7 +108,7 @@ export default function Home() {
               {moves.map((move, index) => (
                 <div key={index}>{move}</div>
               ))}
-            </div>
+            </div> */}
           </div>
         )}
       </main>
