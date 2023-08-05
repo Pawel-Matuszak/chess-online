@@ -31,12 +31,26 @@ export default function handler(
 
   const checkIfRoomIsFull = (id: string) => {
     const room = getRoom(id);
+    console.log(room);
     return room && room.size >= 2 ? true : false;
+  };
+  const leaveAllRooms = async (socket: any) => {
+    for (const room of socket.rooms) {
+      await socket.leave(room);
+    }
   };
 
   io.on("connection", (socket) => {
     const joinGameHandler = async (id: string) => {
       //TODO: check if is already joined
+      if (socket.rooms.has(id)) {
+        socket.emit("joined-game", {
+          status: false,
+          message: "Already joined",
+        });
+        return;
+      }
+
       if (!checkIfRoomExists(id)) {
         socket.emit("joined-game", {
           status: false,
@@ -52,10 +66,12 @@ export default function handler(
         return;
       }
 
+      await leaveAllRooms(socket);
       await socket.join(id);
 
       socket.emit("joined-game", {
         status: true,
+        id,
         message: "Joined game successfully",
       });
 
@@ -71,7 +87,7 @@ export default function handler(
       while (gameId == null || gameId.length !== 5) {
         gameId = generateGameId();
       }
-
+      await leaveAllRooms(socket);
       await socket.join(gameId);
       socket.emit("created-game", { status: true, id: gameId });
     };
@@ -80,9 +96,15 @@ export default function handler(
       io.to(id).emit("game-update", gameString);
     };
 
+    const disconnectHandler = async () => {
+      await leaveAllRooms(socket);
+      console.log(socket.rooms);
+    };
+
     socket.on("join-game", joinGameHandler);
     socket.on("create-game", createGameHandler);
     socket.on("game-update", gameUpdateHandler);
+    socket.on("disconnectt", disconnectHandler);
   });
 
   if (res.socket) res.socket.server.io = io;

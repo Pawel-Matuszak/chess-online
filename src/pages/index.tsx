@@ -1,19 +1,22 @@
 import axios from "axios";
 import Head from "next/head";
 import { ChangeEvent, useEffect, useState } from "react";
+import GameMenu from "~/components/GameMenu";
 import { useSocketState } from "~/hooks/useSocketState";
+import { setRoomId } from "~/state/globalSlice";
+import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
 
 export default function Home() {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
   const [value, setValue] = useState("");
   const [moves, setMoves] = useState<string[]>([]);
-  const [code, setCode] = useState("");
   const { isConnected } = useSocketState();
   const [errorMsg, setErrorMsg] = useState("");
   const [gameJoined, setGameJoined] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
-  const [hideJoinGame, setHideJoinGame] = useState(false);
+  const dispatch = useAppDispatch();
+  const { roomId } = useAppSelector((state) => state.global);
 
   useEffect(() => {
     const socketInit = async () => {
@@ -21,9 +24,18 @@ export default function Home() {
       socket.connect();
       socket.on(
         "joined-game",
-        ({ status, message }: { status: boolean; message: string }) => {
+        ({
+          status,
+          message,
+          id,
+        }: {
+          status: boolean;
+          message: string;
+          id: string;
+        }) => {
           setGameJoined(true);
-          setErrorMsg(status ? "" : message);
+          status && dispatch(setRoomId(id));
+          if (!status) setErrorMsg(message);
         }
       );
 
@@ -34,21 +46,23 @@ export default function Home() {
       socket.on(
         "created-game",
         ({ status, id }: { status: boolean; id: string }) => {
-          status && setCode(id);
+          status && dispatch(setRoomId(id));
           status && setGameJoined(true);
         }
       );
+      setErrorMsg("");
     };
     socketInit().catch(console.error);
 
     return () => {
       socket.disconnect();
+      socket.emit("disconnectt");
+      console.log("first");
     };
   }, []);
 
   useEffect(() => {
     socket.on("game-update", (data) => {
-      console.log("game-update", data);
       setMoves([...moves, data]);
     });
   }, [moves]);
@@ -58,16 +72,7 @@ export default function Home() {
   };
 
   const onSendMessage = (value: string) => {
-    socket.emit("game-update", code, value);
-  };
-
-  const onCreateGame = () => {
-    socket.emit("create-game");
-    setHideJoinGame(true);
-  };
-
-  const onJoinGame = () => {
-    socket.emit("join-game", code);
+    socket.emit("game-update", roomId, value);
   };
 
   return (
@@ -82,30 +87,7 @@ export default function Home() {
           <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
             {isConnected ? "Connected" : "Not Connected"}
           </h1>
-          <div className="flex flex-col items-center justify-center">
-            <button
-              onClick={() => onCreateGame()}
-              className="rounded-sm bg-yellow-300 p-2 font-semibold text-slate-900 "
-            >
-              Create game
-            </button>
-            {hideJoinGame && code && (
-              <div className="">Your game code is: {code}</div>
-            )}
-          </div>
-          {!hideJoinGame && (
-            <div className="">
-              <p>Join game</p>
-              <input
-                className="text-black"
-                type="text"
-                placeholder="Code"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-              />
-              <button onClick={() => onJoinGame()}>Join</button>
-            </div>
-          )}
+          <GameMenu />
           <p className="text-red-600">{errorMsg}</p>
           {gameStarted && (
             <div>

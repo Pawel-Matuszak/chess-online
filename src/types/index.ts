@@ -14,3 +14,8 @@ export interface SocketWithIO extends NetSocket {
 export interface NextApiResponseWithSocket extends NextApiResponse {
   socket: SocketWithIO;
 }
+
+export interface IGlobalSlice {
+  gameState: "initial" | "joined" | "started" | "ended";
+  roomId: string;
+}
