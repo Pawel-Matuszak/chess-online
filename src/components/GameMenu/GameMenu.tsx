@@ -55,7 +55,7 @@ const GameMenu = () => {
         )}
       </div>
       <div className="m-4">
-        <p className="text-center text-red-600">{message}</p>
+        <p className="text-center font-bold text-red-600">{message}</p>
       </div>
     </div>
   );

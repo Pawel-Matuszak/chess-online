@@ -1,3 +1,4 @@
+import { Color } from "chess.js";
 import type { Server as HTTPServer } from "http";
 import type { Socket as NetSocket } from "net";
 import type { NextApiResponse } from "next";
@@ -21,4 +22,13 @@ export interface IGlobalSlice {
   gameState: GameState;
   roomId: string;
   message: string;
+}
+
+export interface IBoardSlice {
+  fen: string;
+  playerColor: Color;
+  settings: {
+    showCoordinates: boolean;
+    arePremovesAllowed: boolean;
+  };
 }

@@ -1,8 +1,11 @@
 import axios from "axios";
+import { Color } from "chess.js";
 import Head from "next/head";
 import { ChangeEvent, useEffect, useState } from "react";
+import Board from "~/components/Board/Board";
 import GameMenu from "~/components/GameMenu/GameMenu";
 import { useSocketState } from "~/hooks/useSocketState";
+import { setGameFen, setPlayerColor } from "~/state/boardSlice";
 import { setGameState, setMessage, setRoomId } from "~/state/globalSlice";
 import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
@@ -22,26 +25,6 @@ export default function Home() {
     const socketInit = async () => {
       await axios.get("/api/socket");
       socket.connect();
-      socket.on(
-        "joined-game",
-        ({
-          status,
-          message,
-          id,
-        }: {
-          status: boolean;
-          message: string;
-          id: string;
-        }) => {
-          dispatch(setGameState("joined"));
-          status && dispatch(setRoomId(id));
-          dispatch(setMessage(!status ? message : ""));
-        }
-      );
-
-      socket.on("start-game", ({ status }: { status: boolean }) => {
-        status && dispatch(setGameState("started"));
-      });
 
       socket.on(
         "created-game",
@@ -53,6 +36,48 @@ export default function Home() {
           }
         }
       );
+
+      socket.on(
+        "joined-game",
+        ({
+          status,
+          message,
+          id,
+        }: {
+          status: boolean;
+          message: string;
+          id: string;
+        }) => {
+          //todo send game fen
+          dispatch(setGameState("joined"));
+          status && dispatch(setRoomId(id));
+          dispatch(setMessage(!status ? message : ""));
+        }
+      );
+
+      socket.on(
+        "start-game",
+        ({
+          status,
+          playerColor,
+          gameFen,
+        }: {
+          status: boolean;
+          playerColor: Color;
+          gameFen: string;
+        }) => {
+          if (status) {
+            dispatch(setGameState("started"));
+            dispatch(setGameFen(gameFen));
+            dispatch(setPlayerColor(playerColor));
+          }
+        }
+      );
+
+      socket.on("game-updated", (fen: string) => {
+        dispatch(setGameFen(fen));
+      });
+
       dispatch(setMessage(""));
     };
     socketInit().catch(console.error);
@@ -89,6 +114,7 @@ export default function Home() {
         {isConnected !== "loading" && (
           <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
             <GameMenu />
+            <Board />
             {/* 
             {isGameStarted && (
               <div>

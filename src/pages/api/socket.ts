@@ -34,6 +34,7 @@ export default function handler(
     const room = getRoom(id);
     return room && room.size >= 2 ? true : false;
   };
+
   const leaveAllRooms = async (
     socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
   ) => {
@@ -41,6 +42,18 @@ export default function handler(
       await socket.leave(room);
     }
   };
+
+  const getAllUsersInRoom = (id: string) => {
+    const room = getRoom(id);
+    return room ? Array.from(room) : [];
+  };
+
+  function shuffleArray(array: any[]) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
 
   io.on("connection", (socket) => {
     const joinGameHandler = async (id: string) => {
@@ -77,11 +90,31 @@ export default function handler(
         message: "Joined game successfully",
       });
 
-      if (getRoom(id)?.size === 2)
-        io.in(id).emit("start-game", {
+      const clients = getAllUsersInRoom(id);
+      if (clients.length === 2) {
+        const roles = ["w", "b"];
+        shuffleArray(roles);
+        if (!clients[0] || !clients[1]) {
+          io.to(id).emit("start-game", {
+            status: false,
+            message: "User not connected",
+          });
+          return;
+        }
+
+        socket.to(id).emit("start-game", {
           status: true,
           message: "Game started",
+          playerColor: roles[1],
+          gameFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
         });
+        socket.emit("start-game", {
+          status: true,
+          message: "Game started",
+          playerColor: roles[0],
+          gameFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        });
+      }
     };
 
     const createGameHandler = async () => {
@@ -94,8 +127,8 @@ export default function handler(
       socket.emit("created-game", { status: true, id: gameId });
     };
 
-    const gameUpdateHandler = (id: string, gameString: string) => {
-      io.to(id).emit("game-update", gameString);
+    const gameUpdateHandler = (id: string, fenAfter: string) => {
+      io.to(id).emit("game-updated", fenAfter);
     };
 
     socket.on("join-game", joinGameHandler);
