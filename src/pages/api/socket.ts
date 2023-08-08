@@ -1,3 +1,4 @@
+import { Chess, Color } from "chess.js";
 import { NextApiRequest } from "next";
 import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
@@ -101,18 +102,20 @@ export default function handler(
           });
           return;
         }
+        // const INITIAL_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        const INITIAL_FEN = "k7/7Q/6Q1/8/8/4K3/8/8 w - - 0 1";
 
         socket.to(id).emit("start-game", {
           status: true,
           message: "Game started",
           playerColor: roles[1],
-          gameFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+          gameFen: INITIAL_FEN,
         });
         socket.emit("start-game", {
           status: true,
           message: "Game started",
           playerColor: roles[0],
-          gameFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+          gameFen: INITIAL_FEN,
         });
       }
     };
@@ -128,6 +131,24 @@ export default function handler(
     };
 
     const gameUpdateHandler = (id: string, fenAfter: string) => {
+      let response: { winner?: Color | "d"; message: string };
+      const chess = new Chess(fenAfter);
+      if (chess.isGameOver()) {
+        if (chess.isCheckmate()) {
+          response = {
+            winner: chess.turn() === "w" ? "b" : "w",
+            message: "Checkmate",
+          };
+        } else {
+          response = {
+            winner: "d",
+            message: "Draw",
+          };
+        }
+
+        io.to(id).emit("game-ended", response);
+      }
+
       io.to(id).emit("game-updated", fenAfter);
     };
 

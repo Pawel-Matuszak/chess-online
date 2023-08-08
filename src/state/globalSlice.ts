@@ -1,8 +1,11 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { Color } from "chess.js";
 import { GameState, IGlobalSlice } from "~/types";
 
 const initialState: IGlobalSlice = {
   gameState: "initial",
+  gameWinner: null,
+  gameStateMessage: "",
   roomId: "",
   message: "",
 };
@@ -20,9 +23,21 @@ const globalSlice = createSlice({
     setMessage: (state, action: PayloadAction<string>) => {
       state.message = action.payload;
     },
+    setGameWinner: (state, action: PayloadAction<Color | "d">) => {
+      state.gameWinner = action.payload;
+    },
+    setGameStateMessage: (state, action: PayloadAction<string>) => {
+      state.gameStateMessage = action.payload;
+    },
   },
 });
 
-export const { setRoomId, setGameState, setMessage } = globalSlice.actions;
+export const {
+  setRoomId,
+  setGameState,
+  setMessage,
+  setGameWinner,
+  setGameStateMessage,
+} = globalSlice.actions;
 
 export default globalSlice.reducer;

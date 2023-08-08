@@ -8,6 +8,7 @@ const initialState: IBoardSlice = {
   settings: {
     showCoordinates: true,
     arePremovesAllowed: true,
+    animationDuration: 0,
   },
 };
 

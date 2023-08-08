@@ -20,6 +20,8 @@ export type GameState = "initial" | "joined" | "started" | "ended";
 
 export interface IGlobalSlice {
   gameState: GameState;
+  gameWinner: Color | "d" | null;
+  gameStateMessage: string;
   roomId: string;
   message: string;
 }
@@ -30,5 +32,6 @@ export interface IBoardSlice {
   settings: {
     showCoordinates: boolean;
     arePremovesAllowed: boolean;
+    animationDuration: 0 | 200 | 300 | 500;
   };
 }

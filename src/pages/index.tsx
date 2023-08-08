@@ -6,7 +6,13 @@ import Board from "~/components/Board/Board";
 import GameMenu from "~/components/GameMenu/GameMenu";
 import { useSocketState } from "~/hooks/useSocketState";
 import { setGameFen, setPlayerColor } from "~/state/boardSlice";
-import { setGameState, setMessage, setRoomId } from "~/state/globalSlice";
+import {
+  setGameState,
+  setGameStateMessage,
+  setGameWinner,
+  setMessage,
+  setRoomId,
+} from "~/state/globalSlice";
 import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
 
@@ -78,6 +84,15 @@ export default function Home() {
         dispatch(setGameFen(fen));
       });
 
+      socket.on(
+        "game-ended",
+        ({ winner, message }: { winner: Color | "d"; message: string }) => {
+          dispatch(setGameState("ended"));
+          dispatch(setGameStateMessage(message));
+          dispatch(setGameWinner(winner));
+        }
+      );
+
       dispatch(setMessage(""));
     };
     socketInit().catch(console.error);
@@ -112,28 +127,12 @@ export default function Home() {
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] font-noto-sans text-white">
         {isConnected !== "loading" && (
-          <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-            <GameMenu />
+          <div className="container flex flex-row flex-wrap items-center justify-center gap-12 px-4 py-16 ">
             <Board />
+            <GameMenu />
             {/* 
             {isGameStarted && (
-              <div>
-                <input
-                  className="text-black"
-                  type="text"
-                  value={value}
-                  onChange={(e) => onChangeHandler(e)}
-                  disabled={!isGameStarted}
-                />
-                <button className="" onClick={() => onSendMessage(value)}>
-                  SEND
-                </button>
-              </div>
-            )}
-            <div className="flex flex-col">
-              {moves.map((move, index) => (
-                <div key={index}>{move}</div>
-              ))}
+             <div>
             </div> */}
           </div>
         )}
