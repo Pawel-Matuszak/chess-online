@@ -29,10 +29,10 @@ const GameMenu = () => {
   }, [showJoinGame, code, roomId]);
 
   return (
-    <div className="rounded-md border-2 border-white p-4">
+    <div className="rounded-md border-2 border-text-primary p-4">
       <div className="m-4">
         <input
-          className="m-2 rounded-sm border-none p-2 text-black outline-none"
+          className="m-2 rounded-sm border-none bg-text-primary p-2 text-background-primary outline-none"
           type="text"
           placeholder="Join Code"
           value={code}

@@ -1,6 +1,7 @@
 import { Dialog } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "~/utils/hooks";
+import Button from "../Common/Button";
 
 const GameEndDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,17 +24,21 @@ const GameEndDialog = () => {
     >
       {gameWinner && (
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="w-full max-w-sm rounded bg-white">
-            <Dialog.Title>
+          <Dialog.Panel className="flex w-full max-w-sm  flex-col items-center rounded bg-white p-8">
+            <Dialog.Title className="text-2xl font-bold">
               {gameWinner == "d"
                 ? "Draw"
                 : gameWinner == playerColor
                 ? "You won"
                 : "You lost"}
             </Dialog.Title>
-            <Dialog.Description>{gameStateMessage}</Dialog.Description>
+            <Dialog.Description className="text-lg">
+              {gameStateMessage}
+            </Dialog.Description>
 
-            <button onClick={() => setIsOpen(false)}>Exit</button>
+            <Button onClick={() => setIsOpen(false)} className="mt-3 p-1 px-4">
+              Close
+            </Button>
           </Dialog.Panel>
         </div>
       )}

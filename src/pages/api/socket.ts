@@ -4,6 +4,9 @@ import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { NextApiResponseWithSocket } from "~/types";
 
+// const INITIAL_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+const INITIAL_FEN = "8/P3k3/8/8/2K5/8/8/8 w - - 0 1";
+
 export default function handler(
   _: NextApiRequest,
   res: NextApiResponseWithSocket
@@ -102,8 +105,6 @@ export default function handler(
           });
           return;
         }
-        // const INITIAL_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        const INITIAL_FEN = "k7/7Q/6Q1/8/8/4K3/8/8 w - - 0 1";
 
         socket.to(id).emit("start-game", {
           status: true,
@@ -130,26 +131,35 @@ export default function handler(
       socket.emit("created-game", { status: true, id: gameId });
     };
 
-    const gameUpdateHandler = (id: string, fenAfter: string) => {
+    const gameUpdateHandler = (
+      id: string,
+      fenAfter: string,
+      pgnAfter: string
+    ) => {
       let response: { winner?: Color | "d"; message: string };
       const chess = new Chess(fenAfter);
+      chess.loadPgn(pgnAfter);
       if (chess.isGameOver()) {
-        if (chess.isCheckmate()) {
-          response = {
-            winner: chess.turn() === "w" ? "b" : "w",
-            message: "Checkmate",
-          };
-        } else {
-          response = {
-            winner: "d",
-            message: "Draw",
-          };
-        }
-
+        response = {
+          winner: chess.isCheckmate()
+            ? chess.turn() === "w"
+              ? "b"
+              : "w"
+            : "d",
+          message: chess.isCheckmate()
+            ? "Checkmate"
+            : chess.isStalemate()
+            ? "Stalemate"
+            : chess.isInsufficientMaterial()
+            ? "Insufficient material"
+            : chess.isThreefoldRepetition()
+            ? "Threefold repetition"
+            : "",
+        };
         io.to(id).emit("game-ended", response);
       }
 
-      io.to(id).emit("game-updated", fenAfter);
+      io.to(id).emit("game-updated", fenAfter, pgnAfter);
     };
 
     socket.on("join-game", joinGameHandler);

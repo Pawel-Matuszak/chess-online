@@ -28,6 +28,7 @@ export interface IGlobalSlice {
 
 export interface IBoardSlice {
   fen: string;
+  pgn: string;
   playerColor: Color;
   settings: {
     showCoordinates: boolean;

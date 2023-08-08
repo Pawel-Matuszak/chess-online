@@ -2,14 +2,15 @@ import { Chess, Square } from "chess.js";
 import { useCallback, useEffect, useState } from "react";
 import { Chessboard } from "react-chessboard";
 import { PromotionPieceOption } from "react-chessboard/dist/chessboard/types";
-import { setGameFen } from "~/state/boardSlice";
+import { setGameFen, setGamePgn } from "~/state/boardSlice";
 import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
-import GameEndDialog from "./GameEndDialog";
 
 const Board = () => {
   const { roomId, gameState } = useAppSelector((state) => state.global);
-  const { fen, playerColor, settings } = useAppSelector((state) => state.board);
+  const { fen, pgn, playerColor, settings } = useAppSelector(
+    (state) => state.board
+  );
   const { showCoordinates, arePremovesAllowed } = useAppSelector(
     (state) => state.board.settings
   );
@@ -34,9 +35,10 @@ const Board = () => {
   useEffect(() => {
     if (fen == game.fen()) return;
     const gameCopy = copyGame();
+    gameCopy.loadPgn(pgn);
     gameCopy.load(fen);
     setGame(gameCopy);
-  }, [fen, game, copyGame]);
+  }, [pgn, fen, game, copyGame]);
 
   const onDrop = (
     sourceSquare: string,
@@ -59,7 +61,9 @@ const Board = () => {
 
     setGame(gameCopy);
     dispatch(setGameFen(gameCopy.fen()));
-    if (gameState == "started") socket.emit("game-update", roomId, move.after);
+    dispatch(setGamePgn(gameCopy.pgn()));
+    if (gameState == "started")
+      socket.emit("game-update", roomId, move.after, gameCopy.pgn());
     return true;
   };
 
@@ -170,8 +174,9 @@ const Board = () => {
 
       setGame(gameCopy);
       dispatch(setGameFen(gameCopy.fen()));
+      dispatch(setGamePgn(gameCopy.pgn()));
       if (gameState == "started")
-        socket.emit("game-update", roomId, move.after);
+        socket.emit("game-update", roomId, move.after, gameCopy.pgn());
 
       setMoveFrom("");
       setMoveTo(null);
@@ -229,9 +234,6 @@ const Board = () => {
         // customBoardStyle
         // customArrowColor
       />
-
-      {/* end game dialog */}
-      <GameEndDialog />
     </div>
   );
 };

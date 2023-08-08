@@ -4,6 +4,7 @@ import { IBoardSlice } from "~/types";
 
 const initialState: IBoardSlice = {
   fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+  pgn: "",
   playerColor: "w",
   settings: {
     showCoordinates: true,
@@ -22,12 +23,16 @@ const boardSlice = createSlice({
     setGameFen: (state, action: PayloadAction<string>) => {
       state.fen = action.payload;
     },
+    setGamePgn: (state, action: PayloadAction<string>) => {
+      state.pgn = action.payload;
+    },
     setNextMove: (state, action: PayloadAction<string>) => {
       state.fen = action.payload;
     },
   },
 });
 
-export const { setPlayerColor, setGameFen, setNextMove } = boardSlice.actions;
+export const { setPlayerColor, setGameFen, setNextMove, setGamePgn } =
+  boardSlice.actions;
 
 export default boardSlice.reducer;
