@@ -33,6 +33,7 @@
     "socket.io": "^4.7.1",
     "socket.io-client": "^4.7.1",
     "superjson": "1.12.2",
+    "tailwind-scrollbar": "^3.0.5",
     "zod": "^3.21.4"
   },
   "devDependencies": {

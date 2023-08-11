@@ -236,6 +236,9 @@ const Board = () => {
 
   return (
     <div className="w-3/4 max-w-2xl">
+      {(gameState == "joined" ||
+        gameState == "started" ||
+        gameState == "ended") && <>Guest - skeleton on loading</>}
       <Chessboard
         position={game.fen()}
         onPieceDrop={onDrop}
@@ -265,6 +268,9 @@ const Board = () => {
         // customBoardStyle
         // customArrowColor
       />
+      {(gameState == "joined" ||
+        gameState == "started" ||
+        gameState == "ended") && <>You</>}
     </div>
   );
 };
