@@ -77,6 +77,7 @@ export default function Home() {
           if (status) {
             dispatch(setGameState("started"));
             dispatch(setGameFen(gameFen));
+            dispatch(setGamePgn(""));
             dispatch(setPlayerColor(playerColor));
           }
         }

@@ -1,8 +1,6 @@
 import { Chess, Square } from "chess.js";
 import { useCallback, useEffect, useState } from "react";
 import { Chessboard } from "react-chessboard";
-import { PromotionPieceOption } from "react-chessboard/dist/chessboard/types";
-import { setGameFen, setGamePgn } from "~/state/boardSlice";
 import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
 
@@ -32,7 +30,11 @@ const Board = () => {
     ) as Chess;
   }, [game]);
 
+  //load updated game
   useEffect(() => {
+    //jaka funkcja sie odpala na premovach???
+    // console.log("fen", fen, game.fen());
+    // console.log("pgn", pgn, game.pgn());
     if (fen == game.fen()) return;
     const gameCopy = copyGame();
     gameCopy.loadPgn(pgn);
@@ -56,153 +58,179 @@ const Board = () => {
         to: targetSquare,
         promotion: piece[1]?.toLowerCase() ?? "q",
       });
+      console.log(gameCopy);
     } catch (error) {}
+
     if (!move) return false;
 
+    // clearMoveClick();
     setGame(gameCopy);
-    dispatch(setGameFen(gameCopy.fen()));
-    dispatch(setGamePgn(gameCopy.pgn()));
+    // saveNewGameState(roomId, gameCopy);
     if (gameState == "started")
       socket.emit("game-update", roomId, move.after, gameCopy.pgn());
+
     return true;
   };
 
-  function onSquareRightClick(square: Square) {
-    const colour = "rgba(0, 0, 255, 0.4)";
-    setRightClickedSquares({
-      ...rightClickedSquares,
-      [square]:
-        rightClickedSquares[square] &&
-        rightClickedSquares[square].backgroundColor === colour
-          ? undefined
-          : { backgroundColor: colour },
-    });
-  }
+  // function onSquareRightClick(square: Square) {
+  //   const colour = "rgba(0, 0, 255, 0.4)";
+  //   setRightClickedSquares({
+  //     ...rightClickedSquares,
+  //     [square]:
+  //       rightClickedSquares[square] &&
+  //       rightClickedSquares[square].backgroundColor === colour
+  //         ? undefined
+  //         : { backgroundColor: colour },
+  //   });
+  // }
 
-  function getMoveOptions(square: Square) {
-    const moves = game.moves({
-      square,
-      verbose: true,
-    });
-    if (
-      moves.length === 0 ||
-      (gameState == "started" && game.turn() !== playerColor)
-    ) {
-      setOptionSquares({});
-      return false;
-    }
+  // function getMoveOptions(square: Square) {
+  //   const moves = game.moves({
+  //     square,
+  //     verbose: true,
+  //   });
+  //   if (
+  //     moves.length === 0 ||
+  //     (gameState == "started" && game.turn() !== playerColor)
+  //   ) {
+  //     setOptionSquares({});
+  //     return false;
+  //   }
 
-    const newSquares = {} as Record<Square, any>;
-    moves.map((move) => {
-      newSquares[move.to] = {
-        background:
-          game.get(move.to) &&
-          game.get(move.to).color !== game.get(square).color
-            ? "radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)"
-            : "radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)",
-        borderRadius: "50%",
-      };
-      return move;
-    });
-    newSquares[square] = {
-      background: "rgba(255, 255, 0, 0.4)",
-    };
-    setOptionSquares(newSquares);
-    return true;
-  }
+  //   const newSquares = {} as Record<Square, any>;
+  //   moves.map((move) => {
+  //     newSquares[move.to] = {
+  //       background:
+  //         game.get(move.to) &&
+  //         game.get(move.to).color !== game.get(square).color
+  //           ? "radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)"
+  //           : "radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)",
+  //       borderRadius: "50%",
+  //     };
+  //     return move;
+  //   });
+  //   newSquares[square] = {
+  //     background: "rgba(255, 255, 0, 0.4)",
+  //   };
+  //   setOptionSquares(newSquares);
+  //   return true;
+  // }
 
-  function onSquareClick(square: Square) {
-    setRightClickedSquares({} as Record<Square, Record<any, any>>);
+  // function onSquareClick(square: Square) {
+  //   setRightClickedSquares({} as Record<Square, Record<any, any>>);
 
-    // from square
-    if (!moveFrom) {
-      const hasMoveOptions = getMoveOptions(square);
-      if (hasMoveOptions) setMoveFrom(square);
-      return;
-    }
+  //   // from square
+  //   if (!moveFrom) {
+  //     const hasMoveOptions = getMoveOptions(square);
+  //     if (hasMoveOptions) setMoveFrom(square);
+  //     return;
+  //   }
 
-    // to square
-    if (!moveTo) {
-      // check if valid move before showing dialog
-      const moveFromSquare = moveFrom as Square;
-      const moves = game.moves({
-        square: moveFromSquare,
-        verbose: true,
-      });
-      const foundMove = moves.find(
-        (m) => m.from === moveFrom && m.to === square
-      );
-      // not a valid move
-      if (!foundMove) {
-        // check if clicked on new piece
-        const hasMoveOptions = getMoveOptions(square);
-        // if new piece, setMoveFrom, otherwise clear moveFrom
-        setMoveFrom(hasMoveOptions ? square : "");
-        return;
-      }
+  //   // to square
+  //   if (!moveTo) {
+  //     // check if valid move before showing dialog
+  //     const moveFromSquare = moveFrom as Square;
+  //     const moves = game.moves({
+  //       square: moveFromSquare,
+  //       verbose: true,
+  //     });
+  //     const foundMove = moves.find(
+  //       (m) => m.from === moveFrom && m.to === square
+  //     );
+  //     // not a valid move
+  //     if (!foundMove) {
+  //       // check if clicked on new piece
+  //       const hasMoveOptions = getMoveOptions(square);
+  //       // if new piece, setMoveFrom, otherwise clear moveFrom
+  //       setMoveFrom(hasMoveOptions ? square : "");
+  //       return;
+  //     }
 
-      // valid move
-      setMoveTo(square);
+  //     // valid move
+  //     setMoveTo(square);
 
-      // if promotion move
-      if (
-        (foundMove.color === "w" &&
-          foundMove.piece === "p" &&
-          square[1] === "8") ||
-        (foundMove.color === "b" &&
-          foundMove.piece === "p" &&
-          square[1] === "1")
-      ) {
-        setShowPromotionDialog(true);
-        return;
-      }
+  //     // if promotion move
+  //     if (
+  //       (foundMove.color === "w" &&
+  //         foundMove.piece === "p" &&
+  //         square[1] === "8") ||
+  //       (foundMove.color === "b" &&
+  //         foundMove.piece === "p" &&
+  //         square[1] === "1")
+  //     ) {
+  //       setShowPromotionDialog(true);
+  //       return;
+  //     }
 
-      // is normal move
-      const gameCopy = copyGame();
-      const move = gameCopy.move({
-        from: moveFrom,
-        to: square,
-        promotion: "q",
-      });
+  //     // is normal move
+  //     const gameCopy = copyGame();
+  //     const move = gameCopy.move({
+  //       from: moveFrom,
+  //       to: square,
+  //       promotion: "q",
+  //     });
 
-      // if invalid, setMoveFrom and getMoveOptions
-      if (move === null) {
-        const hasMoveOptions = getMoveOptions(square);
-        if (hasMoveOptions) setMoveFrom(square);
-        return;
-      }
+  //     // if invalid, setMoveFrom and getMoveOptions
+  //     if (move === null) {
+  //       const hasMoveOptions = getMoveOptions(square);
+  //       if (hasMoveOptions) setMoveFrom(square);
+  //       return;
+  //     }
 
-      setGame(gameCopy);
-      dispatch(setGameFen(gameCopy.fen()));
-      dispatch(setGamePgn(gameCopy.pgn()));
-      if (gameState == "started")
-        socket.emit("game-update", roomId, move.after, gameCopy.pgn());
+  //     saveNewGameState(roomId, gameCopy);
 
-      setMoveFrom("");
-      setMoveTo(null);
-      setOptionSquares({});
-      return;
-    }
-  }
+  //     setMoveFrom("");
+  //     setMoveTo(null);
+  //     setOptionSquares({});
+  //     return;
+  //   }
+  // }
 
-  function onPromotionPieceSelect(piece?: PromotionPieceOption) {
-    // if no piece passed then user has cancelled dialog, don't make move and reset
-    if (piece) {
-      const gameCopy = copyGame();
-      gameCopy.move({
-        from: moveFrom,
-        to: moveTo!,
-        promotion: piece[1]?.toLowerCase() ?? "q",
-      });
-      setGame(gameCopy);
-    }
+  // //promotion on click
+  // function onPromotionPieceSelect(piece?: PromotionPieceOption) {
+  //   if (piece) {
+  //     const gameCopy = copyGame();
+  //     gameCopy.move({
+  //       from: moveFrom,
+  //       to: moveTo!,
+  //       promotion: piece[1]?.toLowerCase() ?? "q",
+  //     });
+  //     saveNewGameState(roomId, gameCopy);
+  //   }
 
-    setMoveFrom("");
-    setMoveTo(null);
-    setShowPromotionDialog(false);
-    setOptionSquares({});
-    return true;
-  }
+  //   clearMoveClick();
+  //   setShowPromotionDialog(false);
+  //   return true;
+  // }
+
+  // //promotion on drop
+  // const onPromotionCheck = (
+  //   sourceSquare: Square,
+  //   targetSquare: Square,
+  //   piece: any
+  // ): boolean => {
+  //   setMoveFrom(sourceSquare);
+  //   setMoveTo(targetSquare);
+  //   return (
+  //     ((piece === "wP" && sourceSquare[1] === "7" && targetSquare[1] === "8") ||
+  //       (piece === "bP" &&
+  //         sourceSquare[1] === "2" &&
+  //         targetSquare[1] === "1")) &&
+  //     Math.abs(sourceSquare.charCodeAt(0) - targetSquare.charCodeAt(0)) <= 1
+  //   );
+  // };
+
+  // const clearMoveClick = () => {
+  //   setMoveFrom("");
+  //   setMoveTo(null);
+  //   setOptionSquares({});
+  // };
+
+  // const saveNewGameState = (roomId: string, gameCopy: Chess) => {
+  //   setGame(gameCopy);
+  //   if (gameState == "started")
+  //     socket.emit("game-update", roomId, gameCopy.fen(), gameCopy.pgn());
+  // };
 
   return (
     <div className="w-3/4 max-w-2xl">
@@ -210,19 +238,20 @@ const Board = () => {
         position={game.fen()}
         onPieceDrop={onDrop}
         boardOrientation={playerColor == "w" ? "white" : "black"}
-        showBoardNotation={showCoordinates}
-        showPromotionDialog={showPromotionDialog}
-        clearPremovesOnRightClick
+        // showBoardNotation={showCoordinates}
+        // showPromotionDialog={showPromotionDialog}
+        // clearPremovesOnRightClick
         arePremovesAllowed
-        animationDuration={settings.animationDuration}
-        onSquareClick={onSquareClick}
-        onSquareRightClick={onSquareRightClick}
-        customSquareStyles={{
-          ...optionSquares,
-          ...rightClickedSquares,
-        }}
-        onPromotionPieceSelect={onPromotionPieceSelect}
-        arePiecesDraggable={gameState !== "ended"}
+        // animationDuration={settings.animationDuration}
+        // // onSquareClick={onSquareClick}
+        // // onSquareRightClick={onSquareRightClick}
+        // customSquareStyles={{
+        //   ...optionSquares,
+        //   ...rightClickedSquares,
+        // }}
+        // // onPromotionPieceSelect={onPromotionPieceSelect}
+        // // onPromotionCheck={onPromotionCheck}
+        // arePiecesDraggable={gameState !== "ended"}
 
         // customSquare || customSquareStyles
         // customPremoveDarkSquareStyle
