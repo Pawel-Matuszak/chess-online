@@ -20,7 +20,7 @@ const GameEndDialog = () => {
     <Dialog
       open={isOpen}
       onClose={() => setIsOpen(false)}
-      className="relative z-50"
+      className="relative z-50 bg-background-secondary text-text-primary"
     >
       {gameWinner && (
         <div className="fixed inset-0 flex items-center justify-center p-4">

@@ -10,14 +10,21 @@ const HistoryComponent = () => {
     .filter((move) => !move.includes("["));
 
   return (
-    <div>
-      {moves.map((move, index) => (
-        <div key={index}>
-          <span>{`${index + 1}.`}</span>
-          <span>{move.split(" ")[0]}</span>
-          <span>{move.split(" ")[1]}</span>
-        </div>
-      ))}
+    <div className=" col-span-1 my-4 h-96 w-full overflow-y-auto bg-background-secondary ">
+      <table className=" w-full table-auto ">
+        <tbody className="grid w-full grid-flow-row grid-rows-3">
+          {moves.map((move, index) => (
+            <tr
+              key={index}
+              className="grid grid-cols-3  px-3 last:border-none  even:bg-background-primary "
+            >
+              <td className="p-2">{`${index + 1}.`}</td>
+              <td className="p-2 font-bold">{move.split(" ")[0]}</td>
+              <td className="p-2 font-bold">{move.split(" ")[1]}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

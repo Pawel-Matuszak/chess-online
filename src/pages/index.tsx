@@ -84,6 +84,7 @@ export default function Home() {
       );
 
       socket.on("game-updated", (fen: string, pgn: string) => {
+        console.log("game-updated", fen, pgn);
         dispatch(setGameFen(fen));
         dispatch(setGamePgn(pgn));
       });
@@ -133,7 +134,7 @@ export default function Home() {
         {isConnected !== "loading" && (
           <div className="container flex flex-row flex-wrap items-center justify-center gap-12 px-4 py-16 ">
             <Board />
-            <div className="self-start">
+            <div className="h-full self-start rounded-md border-2 border-text-primary bg-background-secondary ">
               <GameMenu />
               <HistoryComponent />
             </div>
