@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Color } from "chess.js";
 import Head from "next/head";
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Board from "~/components/Board/Board";
 import GameEndDialog from "~/components/Board/GameEndDialog";
 import GameMenu from "~/components/GameMenu/GameMenu";
@@ -110,6 +110,13 @@ export default function Home() {
         dispatch(setDrawResponseMessage(responseMessage));
       });
 
+      socket.on("game-aborted", (winner: Color, responseMessage: string) => {
+        console.log(responseMessage);
+        dispatch(setGameState("ended"));
+        dispatch(setGameStateMessage(responseMessage));
+        dispatch(setGameWinner(winner));
+      });
+
       dispatch(setMessage(""));
     };
     socketInit().catch(console.error);
@@ -124,16 +131,6 @@ export default function Home() {
       setMoves([...moves, data]);
     });
   }, [moves]);
-
-  const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.value);
-  };
-
-  const onSendMessage = (value: string) => {
-    socket.emit("game-update", roomId, value);
-  };
-
-  const isGameStarted = gameState === "started";
 
   return (
     <>

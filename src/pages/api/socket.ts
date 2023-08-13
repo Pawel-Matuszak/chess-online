@@ -162,9 +162,12 @@ export default function handler(
       };
     };
 
-    const gameAbortHandler = (id: string) => {
-      //todo
-      io.to(id).emit("game-aborted");
+    const gameAbortHandler = (id: string, playerColor: Color) => {
+      io.to(id).emit(
+        "game-aborted",
+        playerColor == "w" ? "b" : "w",
+        "Game aborted"
+      );
     };
 
     const proposeDrawHandler = (id: string) => {
