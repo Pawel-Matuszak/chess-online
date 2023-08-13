@@ -10,7 +10,10 @@ const initialState: IGlobalSlice = {
   message: "",
   isDrawProposed: false,
   isDrawProposalRecieved: false,
+  isRematchProposed: false,
+  isRematchProposalRecieved: false,
   drawResponseMessage: "",
+  rematchResponseMessage: "",
 };
 
 const globalSlice = createSlice({
@@ -41,6 +44,15 @@ const globalSlice = createSlice({
     setDrawResponseMessage: (state, action: PayloadAction<string>) => {
       state.drawResponseMessage = action.payload;
     },
+    setIsRematchProposed: (state, action: PayloadAction<boolean>) => {
+      state.isRematchProposed = action.payload;
+    },
+    setIsRematchProposalRecieved: (state, action: PayloadAction<boolean>) => {
+      state.isRematchProposalRecieved = action.payload;
+    },
+    setRematchResponseMessage: (state, action: PayloadAction<string>) => {
+      state.rematchResponseMessage = action.payload;
+    },
   },
 });
 
@@ -53,6 +65,9 @@ export const {
   setIsDrawProposed,
   setIsDrawProposalRecieved,
   setDrawResponseMessage,
+  setIsRematchProposed,
+  setIsRematchProposalRecieved,
+  setRematchResponseMessage,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

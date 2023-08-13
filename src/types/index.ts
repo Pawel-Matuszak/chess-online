@@ -27,6 +27,9 @@ export interface IGlobalSlice {
   isDrawProposed: boolean;
   isDrawProposalRecieved: boolean;
   drawResponseMessage: string;
+  isRematchProposed: boolean;
+  isRematchProposalRecieved: boolean;
+  rematchResponseMessage: string;
 }
 
 export interface IBoardSlice {

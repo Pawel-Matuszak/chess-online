@@ -14,7 +14,11 @@ import {
   setGameStateMessage,
   setGameWinner,
   setIsDrawProposalRecieved,
+  setIsDrawProposed,
+  setIsRematchProposalRecieved,
+  setIsRematchProposed,
   setMessage,
+  setRematchResponseMessage,
   setRoomId,
 } from "~/state/globalSlice";
 import { useAppDispatch, useAppSelector } from "~/utils/hooks";
@@ -81,6 +85,10 @@ export default function Home() {
             dispatch(setGameFen(gameFen));
             dispatch(setGamePgn(""));
             dispatch(setPlayerColor(playerColor));
+            dispatch(setIsDrawProposed(false));
+            dispatch(setIsDrawProposalRecieved(false));
+            dispatch(setIsRematchProposalRecieved(false));
+            dispatch(setIsRematchProposed(false));
           }
         }
       );
@@ -100,18 +108,23 @@ export default function Home() {
         }
       );
 
-      socket.on("draw-proposed", (message: string) => {
-        console.log(message);
+      socket.on("draw-proposed", () => {
         dispatch(setIsDrawProposalRecieved(true));
       });
 
       socket.on("draw-proposal-decline", (responseMessage: string) => {
-        console.log(responseMessage);
         dispatch(setDrawResponseMessage(responseMessage));
       });
 
+      socket.on("rematch-proposed", () => {
+        dispatch(setIsRematchProposalRecieved(true));
+      });
+
+      socket.on("rematch-proposal-decline", (responseMessage: string) => {
+        dispatch(setRematchResponseMessage(responseMessage));
+      });
+
       socket.on("game-aborted", (winner: Color, responseMessage: string) => {
-        console.log(responseMessage);
         dispatch(setGameState("ended"));
         dispatch(setGameStateMessage(responseMessage));
         dispatch(setGameWinner(winner));

@@ -97,29 +97,33 @@ export default function handler(
 
       const clients = getAllUsersInRoom(id);
       if (clients.length === 2) {
-        const roles = ["w", "b"];
-        shuffleArray(roles);
-        if (!clients[0] || !clients[1]) {
-          io.to(id).emit("start-game", {
-            status: false,
-            message: "User not connected",
-          });
-          return;
-        }
-
-        socket.to(id).emit("start-game", {
-          status: true,
-          message: "Game started",
-          playerColor: roles[1],
-          gameFen: INITIAL_FEN,
-        });
-        socket.emit("start-game", {
-          status: true,
-          message: "Game started",
-          playerColor: roles[0],
-          gameFen: INITIAL_FEN,
-        });
+        startGameHandler(id, clients);
       }
+    };
+
+    const startGameHandler = (id: string, clients: string[]) => {
+      const roles = ["w", "b"];
+      shuffleArray(roles);
+      if (!clients[0] || !clients[1]) {
+        io.to(id).emit("start-game", {
+          status: false,
+          message: "User not connected",
+        });
+        return;
+      }
+
+      socket.to(id).emit("start-game", {
+        status: true,
+        message: "Game started",
+        playerColor: roles[1],
+        gameFen: INITIAL_FEN,
+      });
+      socket.emit("start-game", {
+        status: true,
+        message: "Game started",
+        playerColor: roles[0],
+        gameFen: INITIAL_FEN,
+      });
     };
 
     const createGameHandler = async () => {
@@ -172,7 +176,7 @@ export default function handler(
     };
 
     const proposeDrawHandler = (id: string) => {
-      socket.broadcast.to(id).emit("draw-proposed", "draw?");
+      socket.broadcast.to(id).emit("draw-proposed");
     };
 
     const proposeDrawResponseHandler = (id: string, response: boolean) => {
@@ -187,12 +191,32 @@ export default function handler(
       });
     };
 
+    const proposeRematchHandler = (id: string) => {
+      socket.broadcast.to(id).emit("rematch-proposed");
+    };
+
+    const proposeRematchResponseHandler = (id: string, response: boolean) => {
+      if (!response) {
+        socket.broadcast
+          .to(id)
+          .emit("rematch-proposal-decline", "Rematch declined");
+        return;
+      }
+
+      const clients = getAllUsersInRoom(id);
+      if (clients.length === 2) {
+        startGameHandler(id, clients);
+      }
+    };
+
     socket.on("join-game", joinGameHandler);
     socket.on("create-game", createGameHandler);
     socket.on("game-update", gameUpdateHandler);
     socket.on("abort-game", gameAbortHandler);
     socket.on("propose-draw", proposeDrawHandler);
     socket.on("propose-draw-response", proposeDrawResponseHandler);
+    socket.on("propose-rematch", proposeRematchHandler);
+    socket.on("propose-rematch-response", proposeRematchResponseHandler);
   });
 
   if (res.socket) res.socket.server.io = io;
