@@ -24,6 +24,9 @@ export interface IGlobalSlice {
   gameStateMessage: string;
   roomId: string;
   message: string;
+  isDrawProposed: boolean;
+  isDrawProposalRecieved: boolean;
+  drawResponseMessage: string;
 }
 
 export interface IBoardSlice {

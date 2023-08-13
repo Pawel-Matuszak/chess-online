@@ -8,6 +8,9 @@ const initialState: IGlobalSlice = {
   gameStateMessage: "",
   roomId: "",
   message: "",
+  isDrawProposed: false,
+  isDrawProposalRecieved: false,
+  drawResponseMessage: "",
 };
 
 const globalSlice = createSlice({
@@ -29,6 +32,15 @@ const globalSlice = createSlice({
     setGameStateMessage: (state, action: PayloadAction<string>) => {
       state.gameStateMessage = action.payload;
     },
+    setIsDrawProposed: (state, action: PayloadAction<boolean>) => {
+      state.isDrawProposed = action.payload;
+    },
+    setIsDrawProposalRecieved: (state, action: PayloadAction<boolean>) => {
+      state.isDrawProposalRecieved = action.payload;
+    },
+    setDrawResponseMessage: (state, action: PayloadAction<string>) => {
+      state.drawResponseMessage = action.payload;
+    },
   },
 });
 
@@ -38,6 +50,9 @@ export const {
   setMessage,
   setGameWinner,
   setGameStateMessage,
+  setIsDrawProposed,
+  setIsDrawProposalRecieved,
+  setDrawResponseMessage,
 } = globalSlice.actions;
 
 export default globalSlice.reducer;

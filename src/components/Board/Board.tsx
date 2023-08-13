@@ -3,11 +3,18 @@ import { useCallback, useEffect, useState } from "react";
 import { Chessboard } from "react-chessboard";
 import { PromotionPieceOption } from "react-chessboard/dist/chessboard/types";
 import { setGameFen, setGamePgn } from "~/state/boardSlice";
+import {
+  setDrawResponseMessage,
+  setIsDrawProposalRecieved,
+  setIsDrawProposed,
+} from "~/state/globalSlice";
 import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
 
 const Board = () => {
-  const { roomId, gameState } = useAppSelector((state) => state.global);
+  const { roomId, gameState, drawResponseMessage } = useAppSelector(
+    (state) => state.global
+  );
   const { fen, pgn, playerColor, settings } = useAppSelector(
     (state) => state.board
   );
@@ -233,6 +240,16 @@ const Board = () => {
     if (gameState == "started")
       socket.emit("game-update", roomId, gameCopy.fen(), gameCopy.pgn());
   };
+
+  const restartDrawRequest = () => {
+    dispatch(setIsDrawProposed(false));
+    dispatch(setIsDrawProposalRecieved(false));
+    dispatch(setDrawResponseMessage(""));
+  };
+
+  useEffect(() => {
+    if (drawResponseMessage) restartDrawRequest();
+  }, [pgn]);
 
   return (
     <div className="w-3/4 max-w-2xl">

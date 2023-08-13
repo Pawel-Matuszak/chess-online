@@ -35,7 +35,7 @@ const HistoryComponent = () => {
             return (
               <tr
                 key={index}
-                className="grid grid-cols-2/3 px-3 text-center last:border-none  even:bg-background-primary "
+                className="grid grid-cols-2/3 px-3 text-center last:border-none  even:bg-background-primary even:bg-opacity-70"
               >
                 <td className="p-2">{`${index + 1}.`}</td>
                 <td className="p-2 font-bold">

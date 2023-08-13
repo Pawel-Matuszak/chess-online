@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { BiCopy } from "react-icons/bi";
-import { useAppSelector } from "~/utils/hooks";
+import { setIsDrawProposed } from "~/state/globalSlice";
+import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
 import Button from "../Common/Button";
 import NewGameDialog from "./NewGameDialog";
@@ -9,9 +10,15 @@ const GameMenu = () => {
   const [code, setCode] = useState("");
   const [showJoinGame, setShowJoinGame] = useState(true);
   const [isCopied, setIsCopied] = useState(false);
-  const { roomId, message, gameState } = useAppSelector(
-    (state) => state.global
-  );
+  const {
+    roomId,
+    message,
+    gameState,
+    isDrawProposed,
+    isDrawProposalRecieved,
+    drawResponseMessage,
+  } = useAppSelector((state) => state.global);
+  const dispatch = useAppDispatch();
 
   const onCreateGame = () => {
     socket.emit("create-game");
@@ -31,9 +38,39 @@ const GameMenu = () => {
     setIsCopied(false);
   }, [showJoinGame, code, roomId]);
 
+  const onAbortGame = () => {
+    socket.emit("abort-game");
+  };
+
+  const onProposeDraw = () => {
+    dispatch(setIsDrawProposed(true));
+    socket.emit("propose-draw", roomId);
+  };
+
+  const onResponseDraw = (response: boolean) => {
+    socket.emit("propose-draw-response", roomId, response);
+  };
+
   return (
     <>
-      {gameState == "started" && <div>abort game / propose draw </div>}
+      {gameState == "started" && (
+        <div>
+          <Button onClick={onAbortGame}>abort game</Button>
+          {drawResponseMessage ? (
+            <>Draw declined</>
+          ) : isDrawProposed ? (
+            <>Draw proposed</>
+          ) : isDrawProposalRecieved ? (
+            <>
+              <div>Draw?</div>
+              <Button onClick={() => onResponseDraw(true)}>Accept</Button>
+              <Button onClick={() => onResponseDraw(false)}>Decline</Button>
+            </>
+          ) : (
+            <Button onClick={onProposeDraw}>propose draw</Button>
+          )}
+        </div>
+      )}
       {gameState == "ended" && <div>new game / rematch</div>}
       {(gameState === "initial" || gameState == "joined") && (
         <>

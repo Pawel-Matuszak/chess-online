@@ -136,35 +136,59 @@ export default function handler(
       fenAfter: string,
       pgnAfter: string
     ) => {
-      let response: { winner?: Color | "d"; message: string };
       const chess = new Chess(fenAfter);
       chess.loadPgn(pgnAfter);
       if (chess.isGameOver()) {
-        response = {
-          winner: chess.isCheckmate()
-            ? chess.turn() === "w"
-              ? "b"
-              : "w"
-            : "d",
-          message: chess.isCheckmate()
-            ? "Checkmate"
-            : chess.isStalemate()
-            ? "Stalemate"
-            : chess.isInsufficientMaterial()
-            ? "Insufficient material"
-            : chess.isThreefoldRepetition()
-            ? "Threefold repetition"
-            : "",
-        };
-        io.to(id).emit("game-ended", response);
+        io.to(id).emit("game-ended", gameEndHandler(chess));
       }
 
       io.to(id).emit("game-updated", fenAfter, pgnAfter);
     };
 
+    const gameEndHandler = (
+      chess: Chess
+    ): { winner?: Color | "d"; message: string } => {
+      return {
+        winner: chess.isCheckmate() ? (chess.turn() === "w" ? "b" : "w") : "d",
+        message: chess.isCheckmate()
+          ? "Checkmate"
+          : chess.isStalemate()
+          ? "Stalemate"
+          : chess.isInsufficientMaterial()
+          ? "Insufficient material"
+          : chess.isThreefoldRepetition()
+          ? "Threefold repetition"
+          : "",
+      };
+    };
+
+    const gameAbortHandler = (id: string) => {
+      //todo
+      io.to(id).emit("game-aborted");
+    };
+
+    const proposeDrawHandler = (id: string) => {
+      socket.broadcast.to(id).emit("draw-proposed", "draw?");
+    };
+
+    const proposeDrawResponseHandler = (id: string, response: boolean) => {
+      if (!response) {
+        socket.broadcast.to(id).emit("draw-proposal-decline", "Draw declined");
+        return;
+      }
+
+      io.to(id).emit("game-ended", {
+        winner: "d",
+        message: "Draw by agreement",
+      });
+    };
+
     socket.on("join-game", joinGameHandler);
     socket.on("create-game", createGameHandler);
     socket.on("game-update", gameUpdateHandler);
+    socket.on("abort-game", gameAbortHandler);
+    socket.on("propose-draw", proposeDrawHandler);
+    socket.on("propose-draw-response", proposeDrawResponseHandler);
   });
 
   if (res.socket) res.socket.server.io = io;
