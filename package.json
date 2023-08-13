@@ -24,7 +24,6 @@
     "chess-js": "^2.0.0",
     "chess.js": "^1.0.0-beta.6",
     "next": "^13.4.2",
-    "next-auth": "^4.22.1",
     "react": "18.2.0",
     "react-chessboard": "^4.0.1",
     "react-dom": "18.2.0",
