@@ -13,7 +13,6 @@ export default {
         "main-primary": "#DDD92A",
         "main-secondary": "#EEEFA8",
         "text-primary": "#FAFDF6",
-        "text-primary-1/3": "rgba(250, 253, 246, .3)",
       },
       gridTemplateColumns: {
         // Simple 16 column grid

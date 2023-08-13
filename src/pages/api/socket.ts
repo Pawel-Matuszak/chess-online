@@ -4,7 +4,8 @@ import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { NextApiResponseWithSocket } from "~/types";
 
-const INITIAL_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+export const INITIAL_FEN =
+  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 // const INITIAL_FEN = "8/P3k3/8/8/2K5/8/8/8 w - - 0 1";
 
 export default function handler(

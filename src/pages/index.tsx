@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Board from "~/components/Board/Board";
 import GameEndDialog from "~/components/Board/GameEndDialog";
 import GameMenu from "~/components/GameMenu/GameMenu";
-import HistoryComponent from "~/components/GameMenu/HistoryComponent";
+import HistoryComponent from "~/components/HistoryComponent/HistoryComponent";
 import { useSocketState } from "~/hooks/useSocketState";
 import { setGameFen, setGamePgn, setPlayerColor } from "~/state/boardSlice";
 import {

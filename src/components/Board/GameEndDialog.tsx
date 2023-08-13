@@ -20,11 +20,11 @@ const GameEndDialog = () => {
     <Dialog
       open={isOpen}
       onClose={() => setIsOpen(false)}
-      className="relative z-50 bg-background-secondary text-text-primary"
+      className="relative z-50  text-text-primary"
     >
       {gameWinner && (
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="flex w-full max-w-sm  flex-col items-center rounded bg-white p-8">
+          <Dialog.Panel className="flex w-full max-w-sm  flex-col items-center rounded bg-background-secondary p-8 text-text-primary text-opacity-80">
             <Dialog.Title className="text-2xl font-bold">
               {gameWinner == "d"
                 ? "Draw"

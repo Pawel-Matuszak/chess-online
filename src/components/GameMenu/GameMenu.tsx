@@ -1,70 +1,40 @@
-import { useEffect, useState } from "react";
-import { BiCopy } from "react-icons/bi";
-import { useAppSelector } from "~/utils/hooks";
-import { socket } from "~/utils/socket";
+import { setGameInit } from "~/utils/helpers";
+import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import Button from "../Common/Button";
-import AbortGame from "./AbortGame";
-import DrawComponent from "./DrawComponent";
-import NewGameDialog from "./NewGameDialog";
+import AbortGame from "./partials/AbortGame";
+import DrawComponent from "./partials/DrawComponent";
+import JoinGame from "./partials/JoinGame";
+import { default as NewGame } from "./partials/NewGame";
+import Rematch from "./partials/Rematch";
 
 const GameMenu = () => {
-  const [code, setCode] = useState("");
-  const [showJoinGame, setShowJoinGame] = useState(true);
-  const [isCopied, setIsCopied] = useState(false);
-  const { roomId, message, gameState } = useAppSelector(
-    (state) => state.global
-  );
-  const onCreateGame = () => {
-    socket.emit("create-game");
-    setShowJoinGame(false);
-  };
-
-  const onJoinGame = () => {
-    socket.emit("join-game", code);
-  };
-
-  const copyToClipboard = async () => {
-    await navigator.clipboard.writeText(roomId);
-    setIsCopied(true);
-  };
-
-  useEffect(() => {
-    setIsCopied(false);
-  }, [showJoinGame, code, roomId]);
+  const dispatch = useAppDispatch();
+  const { message, gameState } = useAppSelector((state) => state.global);
 
   return (
     <>
-      {gameState == "started" && <AbortGame />}
-      {gameState == "started" && <DrawComponent />}
-      {gameState == "ended" && <div>new game / rematch</div>}
+      <div className="m-2 flex justify-start gap-4 align-middle">
+        {gameState == "started" && <AbortGame />}
+        {gameState == "started" && <DrawComponent />}
+      </div>
+      {gameState == "ended" && (
+        <div className="flex justify-center gap-4">
+          <Button
+            onClick={() => {
+              setGameInit(dispatch);
+            }}
+          >
+            New Game
+          </Button>
+          <Rematch />
+        </div>
+      )}
       {(gameState === "initial" || gameState == "joined") && (
         <>
-          <div className="w-full rounded-md   p-4">
-            <div className="m-4">
-              <input
-                className="m-2 rounded-sm border-none bg-text-primary p-2 text-background-primary outline-none"
-                type="text"
-                placeholder="Join Code"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-              />
-              <Button onClick={() => onJoinGame()}>Join</Button>
-            </div>
+          <div className="w-full rounded-md p-4">
+            <JoinGame />
             <div className="flex  flex-col items-center justify-start">
-              <Button onClick={() => onCreateGame()}>New game</Button>
-              <NewGameDialog />
-              {!showJoinGame && roomId && (
-                <div className="m-2  text-center" onClick={copyToClipboard}>
-                  <div className="flex cursor-pointer items-center text-lg">
-                    <p className="mx-1">
-                      Your game code is:{" "}
-                      <span className="font-bold">{roomId}</span>
-                    </p>
-                    <BiCopy />
-                  </div>
-                  {isCopied && <p>Copied to clipboard!</p>}
-                </div>
-              )}
+              <NewGame />
             </div>
             <div className="m-4">
               <p className="text-center font-bold text-red-600">{message}</p>
