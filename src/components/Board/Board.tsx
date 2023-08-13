@@ -10,6 +10,8 @@ import {
 } from "~/state/globalSlice";
 import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
+import GuestIcon from "./partials/GuestIcon";
+import PlayerIcon from "./partials/PlayerIcon";
 
 const Board = () => {
   const { roomId, gameState, drawResponseMessage } = useAppSelector(
@@ -253,9 +255,7 @@ const Board = () => {
 
   return (
     <div className="w-3/4 max-w-2xl">
-      {(gameState == "joined" ||
-        gameState == "started" ||
-        gameState == "ended") && <>Guest - skeleton on loading</>}
+      <GuestIcon />
       <Chessboard
         position={game.fen()}
         onPieceDrop={onDrop}
@@ -285,9 +285,7 @@ const Board = () => {
         // customBoardStyle
         // customArrowColor
       />
-      {(gameState == "joined" ||
-        gameState == "started" ||
-        gameState == "ended") && <>You</>}
+      <PlayerIcon />
     </div>
   );
 };
