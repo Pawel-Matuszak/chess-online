@@ -5,10 +5,9 @@ import { useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
 
 const NewGame = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const [showJoinGame, setShowJoinGame] = useState(true);
   const [isCopied, setIsCopied] = useState(false);
-  const { roomId, gameState } = useAppSelector((state) => state.global);
+  const { roomId } = useAppSelector((state) => state.global);
 
   const onCreateGame = () => {
     socket.emit("create-game");
@@ -22,11 +21,7 @@ const NewGame = () => {
 
   useEffect(() => {
     setIsCopied(false);
-  }, [showJoinGame, roomId, isOpen]);
-
-  const onDialogClose = () => {
-    setIsOpen(false);
-  };
+  }, [showJoinGame, roomId]);
 
   return (
     <>

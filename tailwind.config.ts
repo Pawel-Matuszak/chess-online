@@ -10,9 +10,13 @@ export default {
       colors: {
         "background-primary": "#28252C",
         "background-secondary": "#3C3843",
+        // "background-dialog": "#1A4760",
+        "background-dialog": "#2D2833",
         "main-primary": "#DDD92A",
         "main-secondary": "#EEEFA8",
         "text-primary": "#FAFDF6",
+        hover: "#1A4760",
+        "text-hover": "",
       },
       gridTemplateColumns: {
         // Simple 16 column grid

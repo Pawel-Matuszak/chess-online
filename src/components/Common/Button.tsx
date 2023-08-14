@@ -11,7 +11,7 @@ const Button = (props: Props) => {
     <button
       {...props}
       className={
-        "rounded-sm bg-main-primary p-2 font-semibold text-background-secondary " +
+        "rounded-sm bg-main-primary p-2 font-semibold text-background-secondary transition-all hover:bg-opacity-80 " +
         props.className
       }
     >

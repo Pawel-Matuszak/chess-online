@@ -1,7 +1,7 @@
-import { Dialog } from "@headlessui/react";
-import { useEffect, useState } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment, useEffect, useState } from "react";
 import { useAppSelector } from "~/utils/hooks";
-import Button from "../Common/Button";
+import CloseModalBtn from "../Common/CloseModalBtn";
 
 const GameEndDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,32 +17,39 @@ const GameEndDialog = () => {
   }, [gameState]);
 
   return (
-    <Dialog
-      open={isOpen}
-      onClose={() => setIsOpen(false)}
-      className="relative z-50  text-text-primary"
-    >
-      {gameWinner && (
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="flex w-full max-w-sm  flex-col items-center rounded bg-background-secondary p-8 text-text-primary text-opacity-80">
-            <Dialog.Title className="text-2xl font-bold">
-              {gameWinner == "d"
-                ? "Draw"
-                : gameWinner == playerColor
-                ? "You won"
-                : "You lost"}
-            </Dialog.Title>
-            <Dialog.Description className="text-lg">
-              {gameStateMessage}
-            </Dialog.Description>
-
-            <Button onClick={() => setIsOpen(false)} className="mt-3 p-1 px-4">
-              Close
-            </Button>
-          </Dialog.Panel>
-        </div>
-      )}
-    </Dialog>
+    <Transition show={isOpen} as={Fragment}>
+      <Dialog onClose={() => setIsOpen(false)} className="relative z-50">
+        {gameWinner && (
+          <div className="fixed inset-0 flex items-center justify-center p-4">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className="flex min-h-[150px] w-full max-w-sm flex-col items-center rounded bg-background-dialog p-2 text-text-primary text-opacity-80">
+                <CloseModalBtn onClick={() => setIsOpen(false)} />
+                <Dialog.Title className="text-2xl font-bold">
+                  <h3>
+                    {gameWinner == "d"
+                      ? "Draw"
+                      : gameWinner == playerColor
+                      ? "You won"
+                      : "You lost"}
+                  </h3>
+                </Dialog.Title>
+                <Dialog.Description className="my-1 text-lg">
+                  {gameStateMessage}
+                </Dialog.Description>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        )}
+      </Dialog>
+    </Transition>
   );
 };
 

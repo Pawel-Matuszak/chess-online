@@ -32,16 +32,16 @@ const Rematch = () => {
       ) : isRematchProposalRecieved ? (
         <div>
           <div className="text-center">Accept rematch?</div>
-          <div className="flex items-center justify-center ">
+          <div className="flex items-center justify-center gap-2">
             <IconButton
               onClick={() => onResponseRematch(true)}
-              className="px-2 py-0 text-green-500"
+              className="px-2 py-1 text-lg text-green-500  hover:bg-gray-600 hover:text-white"
             >
               <AiOutlineCheck />
             </IconButton>
             <IconButton
               onClick={() => onResponseRematch(false)}
-              className="px-2 py-0 text-red-500"
+              className="px-2 py-1 text-lg text-red-500  hover:bg-gray-600 hover:text-white"
             >
               <AiOutlineClose />
             </IconButton>

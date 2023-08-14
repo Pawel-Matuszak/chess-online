@@ -7,20 +7,19 @@ import GameEndDialog from "~/components/Board/GameEndDialog";
 import GameMenu from "~/components/GameMenu/GameMenu";
 import HistoryComponent from "~/components/HistoryComponent/HistoryComponent";
 import { useSocketState } from "~/hooks/useSocketState";
-import { setGameFen, setGamePgn, setPlayerColor } from "~/state/boardSlice";
+import { setGameFen, setGamePgn } from "~/state/boardSlice";
 import {
   setDrawResponseMessage,
   setGameState,
   setGameStateMessage,
   setGameWinner,
   setIsDrawProposalRecieved,
-  setIsDrawProposed,
   setIsRematchProposalRecieved,
-  setIsRematchProposed,
   setMessage,
   setRematchResponseMessage,
   setRoomId,
 } from "~/state/globalSlice";
+import { setGameInit } from "~/utils/helpers";
 import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
 
@@ -81,14 +80,12 @@ export default function Home() {
           gameFen: string;
         }) => {
           if (status) {
-            dispatch(setGameState("started"));
-            dispatch(setGameFen(gameFen));
-            dispatch(setGamePgn(""));
-            dispatch(setPlayerColor(playerColor));
-            dispatch(setIsDrawProposed(false));
-            dispatch(setIsDrawProposalRecieved(false));
-            dispatch(setIsRematchProposalRecieved(false));
-            dispatch(setIsRematchProposed(false));
+            setGameInit({
+              dispatch,
+              gameState: "started",
+              gameFen,
+              playerColor,
+            });
           }
         }
       );
@@ -144,6 +141,12 @@ export default function Home() {
       setMoves([...moves, data]);
     });
   }, [moves]);
+
+  useEffect(() => {
+    if (gameState !== "initial" && (roomId == "" || !roomId)) {
+      setMessage("Lost connection to server");
+    }
+  }, [roomId, gameState]);
 
   return (
     <>

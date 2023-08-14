@@ -35,20 +35,24 @@ const DrawComponent = () => {
           <div className="flex items-center justify-center ">
             <IconButton
               onClick={() => onResponseDraw(true)}
-              className="px-2 py-0 text-green-500"
+              className="px-2 py-1 text-lg text-green-500  hover:bg-gray-600 hover:text-white"
             >
               <AiOutlineCheck />
             </IconButton>
             <IconButton
               onClick={() => onResponseDraw(false)}
-              className="px-2 py-0 text-red-500"
+              className="px-2 py-1 text-lg text-red-500  hover:bg-gray-600 hover:text-white"
             >
               <AiOutlineClose />
             </IconButton>
           </div>
         </div>
       ) : (
-        <IconButton onClick={onProposeDraw} className="font- text-xl">
+        <IconButton
+          onClick={onProposeDraw}
+          className="h-12 w-12 text-lg"
+          tooltip="Draw"
+        >
           1/2
         </IconButton>
       )}

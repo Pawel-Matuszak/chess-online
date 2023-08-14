@@ -13,15 +13,17 @@ const GameMenu = () => {
 
   return (
     <>
-      <div className="m-2 flex justify-start gap-4 align-middle">
-        {gameState == "started" && <AbortGame />}
-        {gameState == "started" && <DrawComponent />}
-      </div>
+      {gameState == "started" && (
+        <div className="m-2 flex items-center justify-start gap-2">
+          <AbortGame />
+          <DrawComponent />
+        </div>
+      )}
       {gameState == "ended" && (
-        <div className="flex justify-center gap-4">
+        <div className="m-2 flex items-center justify-center gap-4">
           <Button
             onClick={() => {
-              setGameInit(dispatch);
+              setGameInit({ dispatch });
             }}
           >
             New Game
@@ -30,17 +32,15 @@ const GameMenu = () => {
         </div>
       )}
       {(gameState === "initial" || gameState == "joined") && (
-        <>
-          <div className="w-full rounded-md p-4">
-            <JoinGame />
-            <div className="flex  flex-col items-center justify-start">
-              <NewGame />
-            </div>
-            <div className="m-4">
-              <p className="text-center font-bold text-red-600">{message}</p>
-            </div>
+        <div className="w-full rounded-md p-4">
+          <JoinGame />
+          <div className="flex  flex-col items-center justify-start">
+            <NewGame />
           </div>
-        </>
+          <div className="m-4">
+            <p className="text-center font-bold text-red-600">{message}</p>
+          </div>
+        </div>
       )}
     </>
   );
