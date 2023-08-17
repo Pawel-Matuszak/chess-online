@@ -32,11 +32,9 @@ const GameMenu = () => {
         </div>
       )}
       {(gameState === "initial" || gameState == "joined") && (
-        <div className="w-full rounded-md p-4">
+        <div className="w-full rounded-md px-4">
           <JoinGame />
-          <div className="flex  flex-col items-center justify-start">
-            <NewGame />
-          </div>
+          <NewGame />
           <div className="m-4">
             <p className="text-center font-bold text-red-600">{message}</p>
           </div>

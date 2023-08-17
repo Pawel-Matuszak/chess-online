@@ -8,7 +8,7 @@ export default {
         "noto-sans": ["Noto Sans Vithkuqi", "sans-serif"],
       },
       colors: {
-        "background-primary": "#28252C",
+        "background-primary": "#1E1C21",
         "background-secondary": "#3C3843",
         // "background-dialog": "#1A4760",
         "background-dialog": "#2D2833",

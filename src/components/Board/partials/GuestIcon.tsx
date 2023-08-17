@@ -4,7 +4,7 @@ import { useAppSelector } from "~/utils/hooks";
 const GuestIcon = () => {
   const { gameState } = useAppSelector((state) => state.global);
   return (
-    <div className="mb-1 h-8">
+    <div className="absolute top-0 h-10 -translate-y-[100%]">
       {(gameState == "joined" ||
         gameState == "started" ||
         gameState == "ended") && (

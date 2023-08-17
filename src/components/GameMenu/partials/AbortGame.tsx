@@ -40,18 +40,18 @@ const AbortGame = () => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="flex min-h-[150px] w-full max-w-sm flex-col items-center rounded bg-background-dialog p-2 text-text-primary text-opacity-80">
+              <Dialog.Panel className="flex min-h-[150px] w-full max-w-sm flex-col items-center rounded border border-text-primary border-opacity-80 bg-background-dialog p-2 text-text-primary text-opacity-80">
                 <CloseModalBtn onClick={() => setIsOpen(false)} />
-                <Dialog.Title className="mb-3 text-2xl font-bold">
+                <Dialog.Title className="text-2xl font-bold">
                   <h3>Abort game?</h3>
                 </Dialog.Title>
-                <Dialog.Description className="my-5 flex gap-4 text-lg">
-                  <Button onClick={onAbortGame} className="m-2 px-3 py-1">
+                <Dialog.Description className="my-3 flex gap-4 text-lg">
+                  <Button onClick={onAbortGame} className="m-1 px-3 py-1">
                     Abort
                   </Button>
                   <Button
                     onClick={() => setIsOpen(false)}
-                    className="m-2 rounded-md bg-transparent px-3 py-1 text-text-primary opacity-60 "
+                    className="m-1 rounded-md bg-transparent px-3 py-1 text-text-primary opacity-60 "
                   >
                     Cancel
                   </Button>

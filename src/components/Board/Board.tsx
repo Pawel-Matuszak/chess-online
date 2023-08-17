@@ -254,8 +254,9 @@ const Board = () => {
   }, [pgn]);
 
   return (
-    <div className="w-3/4 max-w-2xl">
+    <div className="relative w-3/4 max-w-2xl">
       <GuestIcon />
+      <PlayerIcon />
       <Chessboard
         position={game.fen()}
         onPieceDrop={onDrop}
@@ -285,7 +286,6 @@ const Board = () => {
         // customBoardStyle
         // customArrowColor
       />
-      <PlayerIcon />
     </div>
   );
 };

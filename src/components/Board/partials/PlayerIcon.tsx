@@ -7,7 +7,7 @@ const PlayerIcon = () => {
   const { data: session } = useSession();
 
   return (
-    <div className="m-1 h-8">
+    <div className="absolute bottom-0 m-1 h-8 translate-y-[120%]">
       {(gameState == "joined" ||
         gameState == "started" ||
         gameState == "ended") && (

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { BiCopy } from "react-icons/bi";
 import Button from "~/components/Common/Button";
+import Tooltip from "~/components/Common/Tooltip";
 import { useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
 
@@ -20,26 +21,33 @@ const NewGame = () => {
   };
 
   useEffect(() => {
-    setIsCopied(false);
-  }, [showJoinGame, roomId]);
+    if (isCopied) setTimeout(() => setIsCopied(false), 1000);
+  }, [isCopied]);
 
   return (
-    <>
-      <div>
-        <Button onClick={onCreateGame}>New game</Button>
+    <div className="flex  h-24 flex-col items-center justify-start">
+      <Button onClick={onCreateGame}>New game</Button>
+      <div className="relative m-2 text-center" onClick={copyToClipboard}>
+        {!showJoinGame && roomId && (
+          <>
+            <div className="left- flex cursor-pointer items-center text-lg ">
+              <p className="mx-1">
+                Your game code is: <span className="font-bold">{roomId}</span>
+              </p>
+              <BiCopy />
+            </div>
+            <Tooltip
+              open={isCopied}
+              enterStyles="delay-0 duration-300"
+              leaveStyles="duration-200"
+              styles="left-auto -right-4 -top-7"
+            >
+              Copied!
+            </Tooltip>
+          </>
+        )}
       </div>
-      {!showJoinGame && roomId && (
-        <div className="m-2 text-center" onClick={copyToClipboard}>
-          <div className="flex cursor-pointer items-center text-lg">
-            <p className="mx-1">
-              Your game code is: <span className="font-bold">{roomId}</span>
-            </p>
-            <BiCopy />
-          </div>
-          {isCopied && <p>Copied to clipboard!</p>}
-        </div>
-      )}
-    </>
+    </div>
   );
 };
 

@@ -6,7 +6,7 @@ const Navbar = () => {
   const { data: session } = useSession();
   console.log(session);
   return (
-    <div className="flex w-5/6 items-center justify-between gap-4">
+    <div className="flex w-5/6 items-center justify-between gap-4 py-2">
       <h1 className="text-4xl font-bold">Chess Online</h1>
       <div className="flex items-center gap-4 rounded-md bg-background-secondary p-2 px-4">
         {session ? (
