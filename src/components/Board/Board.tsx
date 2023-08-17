@@ -254,7 +254,7 @@ const Board = () => {
   }, [pgn]);
 
   return (
-    <div className="relative w-3/4 max-w-2xl">
+    <div className="relative w-3/4 max-w-2xl max-sm:w-11/12">
       <GuestIcon />
       <PlayerIcon />
       <Chessboard

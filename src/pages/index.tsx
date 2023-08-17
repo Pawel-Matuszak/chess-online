@@ -4,9 +4,8 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import Board from "~/components/Board/Board";
 import GameEndDialog from "~/components/Board/GameEndDialog";
-import GameMenu from "~/components/GameMenu/GameMenu";
-import HistoryComponent from "~/components/HistoryComponent/HistoryComponent";
 import Navbar from "~/components/Navbar/Navbar";
+import Sidebar from "~/components/Sidebar/Sidebar";
 import { useSocketState } from "~/hooks/useSocketState";
 import { setGameFen, setGamePgn } from "~/state/boardSlice";
 import {
@@ -156,13 +155,9 @@ export default function Home() {
       <main className="flex min-h-screen flex-col items-center justify-start bg-gradient-to-b from-background-primary to-background-primary font-noto-sans text-white">
         <Navbar />
         {isConnected !== "loading" && (
-          <div className="container mt-4 flex flex-row flex-wrap items-center justify-center gap-8 px-4 py-16">
+          <div className=" mt-4 flex flex-row flex-wrap items-center justify-center gap-8 px-4 py-16">
             <Board />
-            <div className="h-full self-start rounded-md bg-background-secondary py-4 shadow-md">
-              <GameMenu />
-              <HistoryComponent />
-            </div>
-
+            <Sidebar />
             <GameEndDialog />
           </div>
         )}

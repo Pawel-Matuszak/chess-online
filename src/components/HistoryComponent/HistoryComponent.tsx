@@ -23,7 +23,7 @@ const HistoryComponent = () => {
   return (
     <div
       ref={scrollContentRef}
-      className="col-span-1 my-4 h-96 min-w-[340px]  overflow-y-auto bg-background-secondary scrollbar-thin  scrollbar-thumb-text-primary-1/3  scrollbar-thumb-rounded-lg"
+      className="scrollbar-thumb-text-primary-1/3 col-span-1 my-4 h-96 min-w-[340px] overflow-y-auto bg-background-secondary scrollbar-thin  scrollbar-thumb-rounded-lg  max-sm:min-w-fit"
     >
       <table className=" w-full table-auto ">
         <tbody className="grid w-full grid-flow-row grid-rows-3">

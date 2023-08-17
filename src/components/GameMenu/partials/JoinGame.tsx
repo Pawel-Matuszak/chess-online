@@ -8,7 +8,7 @@ const JoinGame = () => {
     socket.emit("join-game", code);
   };
   return (
-    <div className="m-4">
+    <div className="my-4 flex w-full items-center justify-center">
       <input
         className="m-2 rounded-sm border-none bg-text-primary p-2 text-background-primary outline-none"
         type="text"
