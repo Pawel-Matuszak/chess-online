@@ -66,9 +66,10 @@ export default function Home() {
           id: string;
         }) => {
           //todo send game fen
-          dispatch(setGameState("joined"));
-          status && dispatch(setRoomId(id));
           dispatch(setMessage(!status ? message : ""));
+          if (!status) return;
+          dispatch(setGameState("joined"));
+          dispatch(setRoomId(id));
         }
       );
 

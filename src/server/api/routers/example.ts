@@ -12,6 +12,53 @@ export const mainRouter = createTRPCRouter({
         },
       })) as GetResult<any, any>;
     }),
+  joinRoom: publicProcedure
+    .input(z.object({ roomId: z.string(), userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const room = await ctx.prisma.room.findUnique({
+        where: { id: input.roomId },
+      });
+      if (!room) {
+        return { status: false, message: "Room not found" };
+      }
+
+      //todo prod uncomment
+      // if (room.userId.includes(input.userId)) {
+      //   return { status: false, message: "Already joined" };
+      // }
+
+      if (room.userId.length >= 2) {
+        return { status: false, message: "Room is full" };
+      }
+
+      await ctx.prisma.room.update({
+        where: { id: input.roomId },
+        data: {
+          userId: [...room.userId, input.userId],
+        },
+      });
+
+      return { status: true, message: "Joined room" };
+    }),
+
+    createGame: publicProcedure
+    .input(z.object({ roomId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const roomData = await ctx.prisma.game.create({
+        data: {
+          playerBlackId:  
+          playerWhiteId:,
+        },
+      });
+      
+      await ctx.prisma.room.update({
+        where: { id: input.roomId },
+        data: {
+          status: "PLAYING",
+          roomId: roomData.id,
+        },
+      });
+
 
   //   getAll: publicProcedure.query(({ ctx }) => {
   //     return ctx.prisma.example.findMany() as Prisma.PrismaPromise<any>;

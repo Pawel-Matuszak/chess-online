@@ -1,11 +1,20 @@
 import { useState } from "react";
 import Button from "~/components/Common/Button";
+import { setMessage } from "~/state/globalSlice";
+import { api } from "~/utils/api";
+import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
 
 const JoinGame = () => {
   const [code, setCode] = useState("");
-  const onJoinGame = () => {
-    socket.emit("join-game", code);
+  const { userId } = useAppSelector((state) => state.global);
+  const { mutateAsync } = api.main.joinRoom.useMutation();
+  const dispatch = useAppDispatch();
+
+  const onJoinGame = async () => {
+    const { status, message } = await mutateAsync({ roomId: code, userId });
+    dispatch(setMessage(!status ? message : ""));
+    if (status) socket.emit("join-game", code);
   };
   return (
     <div className="my-4 flex w-full items-center justify-center">

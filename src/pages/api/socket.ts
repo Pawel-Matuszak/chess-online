@@ -61,29 +61,6 @@ export default function handler(
 
   io.on("connection", (socket) => {
     const joinGameHandler = async (id: string) => {
-      if (socket.rooms.has(id)) {
-        socket.emit("joined-game", {
-          status: false,
-          message: "Already joined",
-        });
-        return;
-      }
-
-      if (!checkIfRoomExists(id)) {
-        socket.emit("joined-game", {
-          status: false,
-          message: "Room not found",
-        });
-        return;
-      }
-      if (checkIfRoomIsFull(id)) {
-        socket.emit("joined-game", {
-          status: false,
-          message: "Room full",
-        });
-        return;
-      }
-
       await leaveAllRooms(socket);
       await socket.join(id);
       socket.emit("joined-game", {
@@ -92,10 +69,11 @@ export default function handler(
         message: "Joined game successfully",
       });
 
-      const clients = getAllUsersInRoom(id);
-      if (clients.length === 2) {
-        startGameHandler(id, clients);
-      }
+      //start game if room is full
+      // const clients = getAllUsersInRoom(id);
+      // if (clients.length === 2) {
+      //   startGameHandler(id, clients);
+      // }
     };
 
     const startGameHandler = (id: string, clients: string[]) => {
