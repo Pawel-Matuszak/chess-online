@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Color } from "chess.js";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import Board from "~/components/Board/Board";
@@ -18,18 +19,24 @@ import {
   setMessage,
   setRematchResponseMessage,
   setRoomId,
+  setUserId,
 } from "~/state/globalSlice";
 import { setGameInit } from "~/utils/helpers";
 import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
 
 export default function Home() {
-  // const hello = api.example.hello.useQuery({ text: "from tRPC" });
-
   const [moves, setMoves] = useState<string[]>([]);
   const { isConnected } = useSocketState();
   const dispatch = useAppDispatch();
   const { roomId, gameState } = useAppSelector((state) => state.global);
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session) {
+      dispatch(setUserId(session.user.id));
+    }
+  }, [session]);
 
   useEffect(() => {
     const socketInit = async () => {

@@ -7,7 +7,6 @@ import { NextApiResponseWithSocket } from "~/types";
 export const INITIAL_FEN =
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 // const INITIAL_FEN = "8/P3k3/8/8/2K5/8/8/8 w - - 0 1";
-
 export default function handler(
   _: NextApiRequest,
   res: NextApiResponseWithSocket
@@ -62,8 +61,6 @@ export default function handler(
 
   io.on("connection", (socket) => {
     const joinGameHandler = async (id: string) => {
-      // console.log(getRoom(id));
-
       if (socket.rooms.has(id)) {
         socket.emit("joined-game", {
           status: false,
@@ -126,14 +123,10 @@ export default function handler(
       });
     };
 
-    const createGameHandler = async () => {
-      let gameId;
-      while (gameId == null || gameId.length !== 5) {
-        gameId = generateGameId();
-      }
+    const createGameHandler = async (roomId: string) => {
       await leaveAllRooms(socket);
-      await socket.join(gameId);
-      socket.emit("created-game", { status: true, id: gameId });
+      await socket.join(roomId);
+      socket.emit("created-game", { status: true, id: roomId });
     };
 
     const gameUpdateHandler = (
@@ -217,6 +210,9 @@ export default function handler(
     socket.on("propose-draw-response", proposeDrawResponseHandler);
     socket.on("propose-rematch", proposeRematchHandler);
     socket.on("propose-rematch-response", proposeRematchResponseHandler);
+    // socket.on("disconnect", () => {
+    //   console.log("disconnected");
+    // });
   });
 
   if (res.socket) res.socket.server.io = io;

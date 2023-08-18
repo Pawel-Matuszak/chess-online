@@ -7,6 +7,7 @@ const initialState: IGlobalSlice = {
   gameWinner: null,
   gameStateMessage: "",
   roomId: "",
+  userId: "",
   message: "",
   isDrawProposed: false,
   isDrawProposalRecieved: false,
@@ -22,6 +23,9 @@ const globalSlice = createSlice({
   reducers: {
     setRoomId: (state, action: PayloadAction<string>) => {
       state.roomId = action.payload;
+    },
+    setUserId: (state, action: PayloadAction<string>) => {
+      state.userId = action.payload;
     },
     setGameState: (state, action: PayloadAction<GameState>) => {
       state.gameState = action.payload;
@@ -58,6 +62,7 @@ const globalSlice = createSlice({
 
 export const {
   setRoomId,
+  setUserId,
   setGameState,
   setMessage,
   setGameWinner,

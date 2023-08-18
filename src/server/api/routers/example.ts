@@ -1,13 +1,16 @@
+import { GetResult } from "@prisma/client/runtime/library";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-export const exampleRouter = createTRPCRouter({
-  session: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
+export const mainRouter = createTRPCRouter({
+  createRoom: publicProcedure
+    .input(z.object({ userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return (await ctx.prisma.room.create({
+        data: {
+          userId: [input.userId],
+        },
+      })) as GetResult<any, any>;
     }),
 
   //   getAll: publicProcedure.query(({ ctx }) => {
