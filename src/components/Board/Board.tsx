@@ -8,10 +8,9 @@ import {
   setIsDrawProposalRecieved,
   setIsDrawProposed,
 } from "~/state/globalSlice";
+import { api } from "~/utils/api";
 import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
-import GuestIcon from "./partials/GuestIcon";
-import PlayerIcon from "./partials/PlayerIcon";
 
 const Board = () => {
   const { roomId, gameState, drawResponseMessage } = useAppSelector(
@@ -23,6 +22,7 @@ const Board = () => {
   const { showCoordinates, arePremovesAllowed } = useAppSelector(
     (state) => state.board.settings
   );
+  const { data } = api.main.getPlayers.useQuery({ roomId });
 
   const [game, setGame] = useState<Chess>(new Chess(fen));
   const [rightClickedSquares, setRightClickedSquares] = useState(
@@ -255,8 +255,14 @@ const Board = () => {
 
   return (
     <div className="relative w-3/4 max-w-2xl max-sm:w-11/12">
-      <GuestIcon />
-      <PlayerIcon />
+      {/* <GuestIcon
+        playerData={
+          !(playerColor == "w") ? data?.playerWhite : data?.playerBlack
+        }
+      />
+      <PlayerIcon
+        playerData={playerColor == "w" ? data?.playerWhite : data?.playerBlack}
+      /> */}
       <Chessboard
         position={game.fen()}
         onPieceDrop={onDrop}

@@ -12,9 +12,12 @@ const JoinGame = () => {
   const dispatch = useAppDispatch();
 
   const onJoinGame = async () => {
-    const { status, message } = await mutateAsync({ roomId: code, userId });
+    const { status, message, playerCount } = await mutateAsync({
+      roomId: code,
+      userId,
+    });
     dispatch(setMessage(!status ? message : ""));
-    if (status) socket.emit("join-game", code);
+    if (status) socket.emit("join-game", code, playerCount);
   };
   return (
     <div className="my-4 flex w-full items-center justify-center">

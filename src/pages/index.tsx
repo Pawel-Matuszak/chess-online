@@ -21,6 +21,7 @@ import {
   setRoomId,
   setUserId,
 } from "~/state/globalSlice";
+import { api } from "~/utils/api";
 import { setGameInit } from "~/utils/helpers";
 import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
@@ -29,8 +30,10 @@ export default function Home() {
   const [moves, setMoves] = useState<string[]>([]);
   const { isConnected } = useSocketState();
   const dispatch = useAppDispatch();
-  const { roomId, gameState } = useAppSelector((state) => state.global);
+  const { roomId, gameState, userId } = useAppSelector((state) => state.global);
   const { data: session } = useSession();
+  const { mutateAsync: mutatePlayerColor } =
+    api.main.setPlayerColor.useMutation();
 
   useEffect(() => {
     if (session) {
@@ -60,38 +63,19 @@ export default function Home() {
           status,
           message,
           id,
+          playerCount,
         }: {
           status: boolean;
           message: string;
           id: string;
+          playerCount: number;
         }) => {
           //todo send game fen
           dispatch(setMessage(!status ? message : ""));
           if (!status) return;
           dispatch(setGameState("joined"));
           dispatch(setRoomId(id));
-        }
-      );
-
-      socket.on(
-        "start-game",
-        ({
-          status,
-          playerColor,
-          gameFen,
-        }: {
-          status: boolean;
-          playerColor: Color;
-          gameFen: string;
-        }) => {
-          if (status) {
-            setGameInit({
-              dispatch,
-              gameState: "started",
-              gameFen,
-              playerColor,
-            });
-          }
+          if (playerCount == 2) socket.emit("start-game", id);
         }
       );
 
@@ -142,9 +126,45 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    socket.on(
+      "start-game",
+      async ({
+        status,
+        playerColor,
+        gameFen,
+      }: {
+        status: boolean;
+        playerColor: Color;
+        gameFen: string;
+      }) => {
+        console.log(playerColor);
+        if (status) {
+          await mutatePlayerColor({
+            roomId,
+            userId,
+            playerColor: playerColor == "w" ? "WHITE" : "BLACK",
+          });
+          setGameInit({
+            dispatch,
+            gameState: "started",
+            gameFen,
+            playerColor,
+          });
+        }
+      }
+    );
+    return () => {
+      socket.off("start-game");
+    };
+  }, [roomId, userId]);
+
+  useEffect(() => {
     socket.on("game-update", (data) => {
       setMoves([...moves, data]);
     });
+    return () => {
+      socket.off("game-update");
+    };
   }, [moves]);
 
   useEffect(() => {

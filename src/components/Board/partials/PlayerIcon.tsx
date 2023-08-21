@@ -2,7 +2,11 @@ import { useSession } from "next-auth/react";
 import { FaUser } from "react-icons/fa";
 import { useAppSelector } from "~/utils/hooks";
 
-const PlayerIcon = () => {
+interface PlayerIconProps {
+  playerData: any;
+}
+
+const PlayerIcon: React.FC<PlayerIconProps> = ({ playerData }) => {
   const { gameState } = useAppSelector((state) => state.global);
   const { data: session } = useSession();
 
@@ -15,12 +19,14 @@ const PlayerIcon = () => {
           {session ? (
             <>
               <img
-                src={session.user.image ?? ""}
+                src={session.user.image ?? playerData.name ?? ""}
                 width={24}
                 height={24}
                 alt="profile-picture"
               />
-              <h3 className="w- text-lg">{session.user.name}</h3>
+              <h3 className="w- text-lg">
+                {session.user.name ?? playerData.name}
+              </h3>
             </>
           ) : (
             <>

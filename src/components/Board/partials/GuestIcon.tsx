@@ -1,8 +1,13 @@
 import { FaUser } from "react-icons/fa";
 import { useAppSelector } from "~/utils/hooks";
 
-const GuestIcon = () => {
+interface GuestIconProps {
+  playerData: any;
+}
+
+const GuestIcon: React.FC<GuestIconProps> = ({ playerData }) => {
   const { gameState } = useAppSelector((state) => state.global);
+
   return (
     <div className="absolute top-0 h-10 -translate-y-[100%]">
       {(gameState == "joined" ||
@@ -26,7 +31,21 @@ const GuestIcon = () => {
             </div>
           ) : (
             <>
-              <FaUser /> Guest
+              {playerData ? (
+                <>
+                  <img
+                    src={playerData.name ?? ""}
+                    width={24}
+                    height={24}
+                    alt="profile-picture"
+                  />
+                  <h3 className="w- text-lg">{playerData.name}</h3>
+                </>
+              ) : (
+                <>
+                  <FaUser /> Guest
+                </>
+              )}
             </>
           )}
         </div>

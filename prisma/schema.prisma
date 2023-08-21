@@ -64,8 +64,8 @@ model VerificationToken {
 
 model Game {
     id String @id @default(auto())  @map("_id")  @db.ObjectId 
-    playerBlackId String 
-    playerWhiteId String
+    playerBlackId String @default("")
+    playerWhiteId String @default("")
     createdAt DateTime @default(now())
     pgn String @default("")
     fen String @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
