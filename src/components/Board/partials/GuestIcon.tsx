@@ -1,8 +1,8 @@
 import { FaUser } from "react-icons/fa";
 import { useAppSelector } from "~/utils/hooks";
 
-interface GuestIconProps {
-  playerData: any;
+export interface GuestIconProps {
+  playerData: { name: string };
 }
 
 const GuestIcon: React.FC<GuestIconProps> = ({ playerData }) => {

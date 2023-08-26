@@ -3,7 +3,7 @@ import { FaUser } from "react-icons/fa";
 import { useAppSelector } from "~/utils/hooks";
 
 interface PlayerIconProps {
-  playerData: any;
+  playerData: { name: string; image: string };
 }
 
 const PlayerIcon: React.FC<PlayerIconProps> = ({ playerData }) => {
@@ -19,7 +19,7 @@ const PlayerIcon: React.FC<PlayerIconProps> = ({ playerData }) => {
           {session ? (
             <>
               <img
-                src={session.user.image ?? playerData.name ?? ""}
+                src={session.user.image ?? playerData.image ?? ""}
                 width={24}
                 height={24}
                 alt="profile-picture"

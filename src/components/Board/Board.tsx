@@ -11,6 +11,8 @@ import {
 import { api } from "~/utils/api";
 import { useAppDispatch, useAppSelector } from "~/utils/hooks";
 import { socket } from "~/utils/socket";
+import GuestIcon from "./partials/GuestIcon";
+import PlayerIcon from "./partials/PlayerIcon";
 
 const Board = () => {
   const { roomId, gameState, drawResponseMessage } = useAppSelector(
@@ -255,14 +257,16 @@ const Board = () => {
 
   return (
     <div className="relative w-3/4 max-w-2xl max-sm:w-11/12">
-      {/* <GuestIcon
+      <GuestIcon
         playerData={
-          !(playerColor == "w") ? data?.playerWhite : data?.playerBlack
+          (!(playerColor == "w") ? data?.playerWhite : data?.playerBlack) as any
         }
       />
       <PlayerIcon
-        playerData={playerColor == "w" ? data?.playerWhite : data?.playerBlack}
-      /> */}
+        playerData={
+          (playerColor == "w" ? data?.playerWhite : data?.playerBlack) as any
+        }
+      />
       <Chessboard
         position={game.fen()}
         onPieceDrop={onDrop}
