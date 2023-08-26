@@ -30,7 +30,7 @@ const GameEndDialog = () => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="flex min-h-[150px] w-full max-w-sm flex-col items-center rounded bg-background-dialog p-2 text-text-primary text-opacity-80">
+              <Dialog.Panel className="flex min-h-[150px] w-full max-w-sm flex-col items-center rounded border border-text-primary border-opacity-80 bg-background-dialog p-2 text-text-primary text-opacity-80">
                 <CloseModalBtn onClick={() => setIsOpen(false)} />
                 <Dialog.Title className="text-2xl font-bold">
                   <h3>

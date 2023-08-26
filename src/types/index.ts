@@ -23,6 +23,7 @@ export interface IGlobalSlice {
   gameWinner: Color | "d" | null;
   gameStateMessage: string;
   roomId: string;
+  userId: string;
   message: string;
   isDrawProposed: boolean;
   isDrawProposalRecieved: boolean;
